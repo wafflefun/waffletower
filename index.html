@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waffle Tower Drop</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #2c1e14;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial Rounded MT Bold', 'Comic Sans MS', sans-serif;
+            user-select: none;
+        }
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            max-height: 500px;
+            aspect-ratio: 16/9;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 4px solid #5a3d28;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: #ffecb3; /* Color cálido de base si falla el dibujo */
+        }
+        /* UI overlays */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(44, 30, 20, 0.8);
+            color: #fff;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .panel {
+            background: #f7ca18;
+            padding: 20px 40px;
+            border: 6px solid #8e44ad;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 0 #732d8a;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #2c1e14;
+        }
+        .overlay.active .panel {
+            transform: scale(1);
+        }
+        h1 { margin: 0 0 10px; font-size: 32px; color: #5c3a21; text-shadow: 2px 2px #fff; }
+        p { font-size: 20px; margin: 10px 0; font-weight: bold; }
+        button {
+            background: #2ecc71;
+            border: none;
+            border-bottom: 5px solid #27ae60;
+            color: white;
+            padding: 12px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        button:active {
+            transform: translateY(2px);
+            border-bottom-width: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="gameContainer">
+    <canvas id="gameCanvas" width="800" height="450"></canvas>
+    
+    <!-- Pantalla de Game Over -->
+    <div id="gameOverScreen" class="overlay">
+        <div class="panel" style="border-color: #e67e22; box-shadow: 0 8px 0 #d35400;">
+            <h1 style="color: #d35400;">¡Se cayó la torre! 🥞</h1>
+            <p>Puntaje Final: <span id="finalScore" style="font-size:30px; color:#fff; text-shadow: 2px 2px #000;">0</span></p>
+            <p>Mejor Record: <span id="highScoreText">0</span></p>
+            <button onclick="restartGame()">Volver a Jugar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// ESTADO DEL JUEGO
+let gameState = 'START'; // 'START', 'PLAYING', 'GAME_OVER'
+let score = 0;
+let highScore = localStorage.getItem('waffleHighScore') || 0;
+
+// PARÁMETROS DE DISEÑO/CÁMARA
+let cameraY = 0;
+let targetCameraY = 0;
+const BASE_Y = 380; // Dónde está la mesa/plato
+const WAFFLE_HEIGHT = 20;
+
+// ENTIDADES
+let claw = {
+    x: 400,
+    y: 60,
+    width: 60,
+    speed: 4,
+    direction: 1,
+    amplitude: 280 // Rango de movimiento
+};
+
+let activeWaffle = null;
+let stackedWaffles = [];
+let fallingSlices = []; // Trozos de waffle cortados que caen
+let particles = []; // Brillos y chispas
+
+// Configuración de la física y alineación
+const PERFECT_THRESHOLD = 6; // Píxeles de tolerancia para un "Perfecto"
+
+// CLASES
+class Waffle {
+    constructor(x, y, width, isDropping = false) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = WAFFLE_HEIGHT;
+        this.isDropping = isDropping;
+        this.velocityY = 0;
+        this.gravity = 0.6;
+        this.color = '#e2963a';
+    }
+
+    update() {
+        if (this.isDropping) {
+            this.velocityY += this.gravity;
+            this.y += this.velocityY;
+        }
+    }
+
+    draw(ctx, offset = 0) {
+        ctx.save();
+        ctx.translate(this.x, this.y - offset);
+        
+        // Sombra de volumen
+        ctx.fillStyle = '#b66514';
+        ctx.beginPath();
+        ctx.roundRect(-this.width/2, 2, this.width, this.height, 10);
+        ctx.fill();
+
+        // Cuerpo Waffle principal (color dorado)
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = '#8a4708';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(-this.width/2, -this.height/2, this.width, this.height, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        // Cuadrícula interior (Estilo waffles)
+        ctx.fillStyle = '#c77823';
+        let cols = Math.max(3, Math.floor(this.width / 15));
+        for(let i = 1; i < cols; i++) {
+            let wx = -this.width/2 + (this.width / cols) * i;
+            ctx.fillRect(wx - 2, -this.height/2 + 4, 4, this.height - 8);
+        }
+        ctx.fillRect(-this.width/2 + 5, -2, this.width - 10, 4); // Línea horizontal
+
+        // Ojos y boca cute
+        if (this.width > 35) {
+            ctx.fillStyle = '#2c1e14';
+            // ojo izq
+            ctx.beginPath(); ctx.arc(-10, -1, 2, 0, Math.PI*2); ctx.fill();
+            // ojo der
+            ctx.beginPath(); ctx.arc(10, -1, 2, 0, Math.PI*2); ctx.fill();
+            // boca sonriente
+            ctx.strokeStyle = '#2c1e14';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(0, 1, 3, 0, Math.PI);
+            ctx.stroke();
+            // mejillas
+            ctx.fillStyle = '#ff7675';
+            ctx.beginPath(); ctx.arc(-14, 1, 2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(14, 1, 2, 0, Math.PI*2); ctx.fill();
+        }
+
+        // Mantequilla (Solo se le dibuja si es de los primeros o de adorno)
+        ctx.fillStyle = '#ffeaa7';
+        ctx.strokeStyle = '#eccc68';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(-8, -this.height/2 - 2, 16, 6, 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore();
+    }
+}
+
+// Slice de waffle que cae
+class FallingSlice {
+    constructor(x, y, width) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = WAFFLE_HEIGHT;
+        this.velocityY = -2; // Pequeño rebote inicial
+        this.velocityX = (Math.random() - 0.5) * 4 + (x > 400 ? 3 : -3);
+        this.gravity = 0.5;
+        this.rotation = 0;
+        this.rotSpeed = (Math.random() - 0.5) * 0.2;
+        this.alpha = 1;
+    }
+
+    update() {
+        this.velocityY += this.gravity;
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+        this.rotation += this.rotSpeed;
+        this.alpha -= 0.02;
+    }
+
+    draw(ctx, offset = 0) {
+        if (this.alpha <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.translate(this.x, this.y - offset);
+        ctx.rotate(this.rotation);
+        
+        ctx.fillStyle = '#e2963a';
+        ctx.strokeStyle = '#8a4708';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(-this.width/2, -this.height/2, this.width, this.height, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        // Cuadrícula rápida
+        ctx.fillStyle = '#c77823';
+        ctx.fillRect(-this.width/4, -this.height/2 + 2, 2, this.height - 4);
+        
+        ctx.restore();
+    }
+}
+
+// Partículas de brillo para "Perfecto"
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 6;
+        this.vy = (Math.random() - 0.5) * 6 - 2;
+        this.size = Math.random() * 5 + 3;
+        this.color = Math.random() > 0.5 ? '#fff200' : '#ffffff';
+        this.alpha = 1;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.size *= 0.95;
+        this.alpha -= 0.02;
+    }
+    draw(ctx, offset) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - offset, this.size, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+// INICIALIZACIÓN
+function init() {
+    score = 0;
+    cameraY = 0;
+    targetCameraY = 0;
+    stackedWaffles = [];
+    fallingSlices = [];
+    particles = [];
+
+    // Colocar el plato inicial como una base invisible de 150px de ancho en el centro
+    stackedWaffles.push({
+        x: 400,
+        y: BASE_Y,
+        width: 140,
+        height: 10,
+        isPlate: true
+    });
+
+    spawnWaffleInClaw();
+    gameState = 'PLAYING';
+    document.getElementById('gameOverScreen').classList.remove('active');
+}
+
+function spawnWaffleInClaw() {
+    let nextWidth = stackedWaffles.length > 1 
+        ? stackedWaffles[stackedWaffles.length - 1].width 
+        : 140; // Ancho inicial
+    
+    // Si el waffle es ridículamente pequeño, limitamos un mínimo para que sea jugable
+    if (nextWidth < 20) nextWidth = 20;
+
+    activeWaffle = new Waffle(claw.x, claw.y + 35, nextWidth, false);
+}
+
+// DETECCIÓN DE ENTRADA (Drop)
+window.addEventListener('mousedown', (e) => {
+    if (gameState === 'PLAYING' && activeWaffle && !activeWaffle.isDropping) {
+        activeWaffle.isDropping = true;
+    }
+});
+
+window.addEventListener('touchstart', (e) => {
+    if (gameState === 'PLAYING' && activeWaffle && !activeWaffle.isDropping) {
+        activeWaffle.isDropping = true;
+    }
+});
+
+// BUCLE DE FÍSICAS Y LÓGICA
+function update() {
+    if (gameState === 'PLAYING') {
+        // 1. Mover garra
+        claw.x += claw.speed * claw.direction;
+        let leftLimit = 400 - claw.amplitude/2;
+        let rightLimit = 400 + claw.amplitude/2;
+        if (claw.x <= leftLimit || claw.x >= rightLimit) {
+            claw.direction *= -1;
+        }
+
+        // Si el waffle está en la garra, se mueve con ella
+        if (activeWaffle && !activeWaffle.isDropping) {
+            activeWaffle.x = claw.x;
+        }
+
+        // 2. Caída del Waffle Activo
+        if (activeWaffle && activeWaffle.isDropping) {
+            activeWaffle.update();
+
+            // Evaluar colisión con el waffle de arriba de la torre
+            let topWaffle = stackedWaffles[stackedWaffles.length - 1];
+            let targetY = topWaffle.y - WAFFLE_HEIGHT;
+
+            if (activeWaffle.y >= targetY) {
+                // Verificar si hay traslape
+                let diff = activeWaffle.x - topWaffle.x;
+                let halfWidth = activeWaffle.width / 2;
+                
+                // Pérdida total (Falla la torre)
+                if (Math.abs(diff) >= halfWidth + topWaffle.width / 2) {
+                    gameOver();
+                } else {
+                    // ¡APILAMIENTO EXITOSO!
+                    activeWaffle.y = targetY; // Forzar altura exacta
+                    
+                    // Cálculo de corte
+                    let overlapLeft = Math.max(activeWaffle.x - halfWidth, topWaffle.x - topWaffle.width/2);
+                    let overlapRight = Math.min(activeWaffle.x + halfWidth, topWaffle.x + topWaffle.width/2);
+                    let overlapWidth = overlapRight - overlapLeft;
+                    let overlapX = (overlapLeft + overlapRight) / 2;
+
+                    // Verificar "Perfecto" (Alineación casi total)
+                    if (Math.abs(diff) <= PERFECT_THRESHOLD) {
+                        score += 2; // Doble puntaje por alineación perfecta
+                        triggerPerfectEffects(activeWaffle.x, activeWaffle.y);
+                        // Conservamos el ancho para premiar al jugador
+                        activeWaffle.x = topWaffle.x;
+                    } else {
+                        score += 1;
+                        // Generar rebanada sobrante que cae
+                        let sliceWidth = activeWaffle.width - overlapWidth;
+                        let sliceX = (diff > 0) 
+                            ? activeWaffle.x + halfWidth - sliceWidth/2 
+                            : activeWaffle.x - halfWidth + sliceWidth/2;
+                        
+                        fallingSlices.push(new FallingSlice(sliceX, activeWaffle.y, sliceWidth));
+                        
+                        // Ajustar waffle apilado al nuevo tamaño
+                        activeWaffle.x = overlapX;
+                        activeWaffle.width = overlapWidth;
+                    }
+
+                    // Pasar waffle a la pila
+                    stackedWaffles.push(activeWaffle);
+                    activeWaffle = null;
+
+                    // Desplazamiento de cámara suave
+                    if (stackedWaffles.length > 4) {
+                        targetCameraY = (stackedWaffles.length - 4) * WAFFLE_HEIGHT;
+                    }
+
+                    // Siguiente pieza
+                    setTimeout(spawnWaffleInClaw, 400);
+                }
+            }
+        }
+    }
+
+    // Actualizar Slices que caen
+    for (let i = fallingSlices.length - 1; i >= 0; i--) {
+        fallingSlices[i].update();
+        if (fallingSlices[i].alpha <= 0 || fallingSlices[i].y > 500) {
+            fallingSlices.splice(i, 1);
+        }
+    }
+
+    // Actualizar partículas
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        if (particles[i].alpha <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+
+    // Suavizado del scroll de la cámara
+    cameraY += (targetCameraY - cameraY) * 0.1;
+}
+
+// EFECTOS VISUALES
+function triggerPerfectEffects(x, y) {
+    for (let i = 0; i < 20; i++) {
+        particles.push(new Particle(x + (Math.random()-0.5)*50, y));
+    }
+}
+
+// RENDERIZADO (Canvas)
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. Dibujar Fondo (Interior del restaurante)
+    // Pared
+    let wallGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    wallGradient.addColorStop(0, '#503522');
+    wallGradient.addColorStop(1, '#a87548');
+    ctx.fillStyle = wallGradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Ventana / Brillo de fondo
+    ctx.fillStyle = 'rgba(255, 235, 180, 0.1)';
+    ctx.fillRect(100, 40, 200, 150);
+    ctx.fillRect(500, 40, 200, 150);
+
+    // Mesa en el borde inferior (Inmóvil respecto al scroll si es muy alta, o sube. Aquí sube con la cámara)
+    ctx.save();
+    ctx.translate(0, -cameraY);
+
+    // Mantel y mesa de madera
+    ctx.fillStyle = '#8a4708';
+    ctx.fillRect(80, BASE_Y + 15, 640, 100);
+    
+    // Mantel a cuadros (Pattern manual)
+    ctx.fillStyle = '#ff7675';
+    ctx.fillRect(100, BASE_Y + 20, 600, 80);
+    ctx.fillStyle = '#ffffff';
+    for (let i = 110; i < 680; i += 30) {
+        ctx.fillRect(i, BASE_Y + 20, 15, 80);
+    }
+
+    // Plato (La base)
+    ctx.fillStyle = '#ecf0f1';
+    ctx.strokeStyle = '#bdc3c7';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.ellipse(400, BASE_Y + 10, 100, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // 2. Dibujar la torre de waffles apilados
+    // Empezamos de 1 para evitar dibujar el plato invisible
+    for (let i = 1; i < stackedWaffles.length; i++) {
+        stackedWaffles[i].draw(ctx, 0);
+    }
+    ctx.restore();
+
+    // Dibujar Slices cortados y partículas (con scroll de cámara)
+    for (let slice of fallingSlices) slice.draw(ctx, cameraY);
+    for (let p of particles) p.draw(ctx, cameraY);
+
+    // 3. Dibujar Waffle que está cayendo (Si existe)
+    if (activeWaffle) {
+        activeWaffle.draw(ctx, cameraY);
+    }
+
+    // 4. Dibujar la garra y la barra de metal (Independientes del scroll)
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(50, 15, 700, 6); // Barra superior
+
+    // Garra (Soporte mecánico)
+    ctx.strokeStyle = '#7f8c8d';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(claw.x, 15);
+    ctx.lineTo(claw.x, claw.y);
+    ctx.stroke();
+
+    // Cuerpo de la garra (Claw)
+    ctx.fillStyle = '#95a5a6';
+    ctx.beginPath();
+    ctx.arc(claw.x, claw.y, 10, 0, Math.PI*2);
+    ctx.fill();
+
+    // Brazos izquierdo y derecho de la garra
+    ctx.strokeStyle = '#7f8c8d';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    // Brazo izq
+    ctx.moveTo(claw.x, claw.y);
+    ctx.quadraticCurveTo(claw.x - 20, claw.y + 10, claw.x - 15, claw.y + 30);
+    // Brazo der
+    ctx.moveTo(claw.x, claw.y);
+    ctx.quadraticCurveTo(claw.x + 20, claw.y + 10, claw.x + 15, claw.y + 30);
+    ctx.stroke();
+
+    // 5. Interfaz de Usuario (HUD en pantalla fija)
+    drawHUD();
+}
+
+function drawHUD() {
+    // Marcador de Score (Izquierda)
+    ctx.fillStyle = '#5c3a21';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(20, 20, 130, 35, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(`SCORE: ${score}`, 35, 43);
+
+    // Record de Best Score (Derecha)
+    ctx.fillStyle = '#e67e22';
+    ctx.beginPath();
+    ctx.roundRect(canvas.width - 160, 20, 140, 35, 8);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`⭐ BEST: ${highScore}`, canvas.width - 145, 43);
+
+    // Mensaje inicial (Solo si está recién empezado)
+    if (stackedWaffles.length === 1 && (!activeWaffle || !activeWaffle.isDropping)) {
+        ctx.fillStyle = 'rgba(44, 30, 20, 0.8)';
+        ctx.beginPath();
+        ctx.roundRect(280, 200, 240, 45, 10);
+        ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText("¡TOCA PARA SOLTAR!", 400, 228);
+        ctx.textAlign = 'start'; // Restablecer
+    }
+}
+
+// BUCLE DE ANIMACIÓN
+function loop() {
+    update();
+    draw();
+    requestAnimationFrame(loop);
+}
+
+// FINALIZAR JUEGO
+function gameOver() {
+    gameState = 'GAME_OVER';
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('waffleHighScore', highScore);
+    }
+
+    document.getElementById('finalScore').innerText = score;
+    document.getElementById('highScoreText').innerText = highScore;
+    document.getElementById('gameOverScreen').classList.add('active');
+}
+
+function restartGame() {
+    init();
+}
+
+// Comenzar la primera ejecución
+init();
+loop();
+</script>
+
+</body>
+</html>

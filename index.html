@@ -2,822 +2,1893 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#24120a">
-<title>Waffle Drop Café</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<!-- 🔧 TEXTOS: si cambias TITULO o SUBTITULO (más abajo, en el JavaScript), cámbialos también
+     en estas dos líneas: son las que se ven al compartir el link y en los buscadores.
+     OJO: la descripción dice "5 pruebas" y nombra cada una: si agregas o quitas pruebas
+     (🔧 PRUEBAS), cámbiala aquí a mano (la página no la puede cambiar sola). -->
+<title>Tu edad mental</title>
+<meta name="description" content="5 pruebas rápidas de reflejos, memoria, vista, lógica y concentración para descubrir la edad de tu cerebro.">
+<!--
+=====================================================================
+  🧠 TU EDAD MENTAL — GUÍA RÁPIDA PARA EDITAR
+=====================================================================
+  Todo el juego está en este único archivo (HTML + CSS + JavaScript).
+  Para encontrar lo que quieres cambiar, busca (Ctrl+F) estas marcas:
+
+   🔧 COLORES        → colores y fuentes de la página (en el CSS) y colores
+                       de la imagen del resultado (COLORES_CARTA, en el JavaScript)
+   🔧 CONFIG         → sonido, volumen, link para compartir, marca, récord
+     ⏱️ TIEMPOS      → (dentro de CONFIG) cuenta regresiva, contador del
+                       final, avisos, bloqueo del doble toque, segundo
+                       toque del 🏠. Cada prueba tiene ADEMÁS sus propios
+                       tiempos dentro de su sección (busca ⏱️).
+   🔧 REFLEJOS       → rondas, cuánto dura el rojo, castigos por tocar antes
+   🔧 MEMORIA        → largo inicial, vidas, cuánto se ilumina cada casilla
+                       y los emojis de las casillas (EMOJIS_MEMORIA)
+   🔧 VISTA          → tiempo, castigo por error, tamaño de la cuadrícula
+                       y la lista de pares de emojis (PARES_VISTA)
+   🔧 LÓGICA         → tiempo, cuánto restan los errores, las cuentas
+                       automáticas y la lista de preguntas (PREGUNTAS_LOGICA)
+   🔧 CONCENTRACIÓN  → tiempo y la lista de colores (COLORES_STROOP)
+   🔧 PRUEBAS        → qué pruebas salen, en qué orden y cuánto pesa cada
+                       una en la edad final. Tiene un paso a paso para
+                       agregar una prueba nueva y un ejemplo listo para usar.
+   🔧 EDADES         → cómo se convierte cada puntaje en años (explicado
+                       con un ejemplo con números)
+   🔧 RESULTADOS     → las frases del final según la edad ("un abuelo sabio")
+   🔧 TEXTOS         → todos los demás textos que se ven en pantalla
+   🔧 SONIDOS        → notas, duración y volumen de cada sonido
+   🔧 CARTA          → la imagen de 1080 x 1350 que se descarga o comparte
+   💡 IDEA           → cosas que se podrían agregar más adelante (cada idea
+                       está escrita justo donde habría que programarla)
+
+  OJO: las marcas LÓGICA y CONCENTRACIÓN llevan tilde: búscalas con tilde.
+  Para ver todos los puntajes "excelente" y "malo" juntos, busca EXCELENTE.
+
+  AYUDAS PARA PROBAR (se agregan al final de la dirección de la página):
+   • ?prueba=memoria  → juega SÓLO esa prueba y muestra su resultado.
+       Nombres posibles (sin tildes): reflejos, memoria, vista, logica,
+       concentracion.  Ejemplo:  index.html?prueba=vista
+   • ?rapido=1        → los tiempos se dividen por CONFIG.FACTOR_RAPIDO
+       (4): sólo para probar rápido, las pruebas se vuelven rarísimas.
+       NO se aceleran: el límite de "¡Muy lento!" de Reflejos (LIMITE)
+       ni lo que dura el aviso de abajo (TIEMPO_AVISO).
+   • Se pueden juntar:  index.html?prueba=logica&rapido=1
+   • Con ?prueba= o ?rapido=1 NO se guarda el récord (así tus pruebas
+     no cuentan como partidas de verdad).
+   • Teclas: M = sonido. Reflejos: Espacio o Enter. Lógica y
+     Concentración: 1, 2, 3 y 4 (para cambiarlas, busca alPresionarTecla).
+     Memoria y Vista: con Tab se llega a la cuadrícula y con las flechas
+     se mueve entre los emojis.
+   • Si en medio de una prueba la persona cambia de pestaña o minimiza el
+     navegador, el juego se pone en pausa solo ("Pausa — toca para
+     seguir"): el reloj de la prueba se congela, la prueba se tapa (para
+     que nadie busque con el reloj parado) y en Reflejos la ronda que iba
+     se repite desde el principio.
+   • Para que un doble toque no se salte las instrucciones, los botones de
+     una pantalla recién aparecida no responden durante un ratito
+     (CONFIG.BLOQUEO_TOQUE). Y el 🏠 de arriba pide un segundo toque si
+     hay una partida a medias (CONFIG.TIEMPO_SALIR).
+
+  Regla de oro: casi todo lo que se puede cambiar está en los objetos
+  de configuración de arriba. Cada número tiene una nota que dice qué
+  hace y en qué unidad está (ms = milésimas de segundo: 1000 ms = 1
+  segundo; segundos; px = puntos de la pantalla).
+=====================================================================
+-->
+
+<!-- Fuentes: "Bangers" (títulos estilo cómic) y "Nunito" (texto).
+     🔧 COLORES: para cambiar de fuente, cambia el link y las variables
+     --fuente-titulo / --fuente-texto más abajo. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:ital,wght@0,600;0,800;0,900;1,700&display=swap" rel="stylesheet">
+
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none;background:#24120a}
-body{
-  background:radial-gradient(ellipse at 50% 40%,#4a2514 0%,#24120a 75%);
-  font-family:"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif}
-#stage{position:fixed;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);display:flex;align-items:center;justify-content:center}
-#wrap{position:relative;flex:none;width:300px;height:169px;border-radius:22px;overflow:hidden;background:#6b3a20;
-  box-shadow:0 10px 40px rgba(0,0,0,.55),0 0 0 2px rgba(255,214,150,.12)}
-#wrap::after{content:"";position:absolute;inset:0;border:4px solid #2a1408;border-radius:22px;pointer-events:none}
-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+  /* =================================================================
+     🔧 COLORES de la página
+     Cambia estos valores y toda la página cambia de color.
+     (Las versiones transparentes, como el fondo verdoso de una respuesta
+      correcta, se sacan solas de estos colores con color-mix(…): no hay
+      que cambiarlas. La línea rgba(…) que va justo antes es sólo para
+      navegadores muy antiguos.)
+     (Los colores de la imagen que se descarga están en COLORES_CARTA,
+      y los colores de la prueba de Concentración en COLORES_STROOP,
+      los dos dentro del JavaScript más abajo)
+     ================================================================= */
+  :root {
+    --fondo: #12061f;          /* color de fondo principal */
+    --fondo-2: #2b0b45;        /* segundo color del degradado de fondo */
+    --panel: rgba(255, 255, 255, 0.06);   /* fondo de las cajas */
+    --borde: rgba(255, 255, 255, 0.14);   /* bordes de las cajas */
+    --texto: #f6ecff;          /* texto principal */
+    --texto-suave: #bda9d6;    /* texto secundario */
+    --acento: #ff3b8d;         /* color de botones principales (rosado) */
+    --acento-2: #8a5cff;       /* segundo color de acento (morado) */
+    --ok: #3dffa8;             /* color de "bien" (respuestas correctas, barras jóvenes) */
+    --peligro: #ff2d55;        /* color de "mal" (errores, poco tiempo, barras viejas) */
+    --radio: 18px;             /* qué tan redondeadas son las esquinas */
+    --fuente-titulo: "Bangers", "Impact", sans-serif;
+    --fuente-texto: "Nunito", system-ui, sans-serif;
+    /* Colores propios de este juego */
+    --amarillo: #ffd23f;       /* barras "más o menos" e insignia del robot */
+    --espera: #e0213f;         /* Reflejos: zona roja "Espera…" */
+    --ya: #22d37a;             /* Reflejos: zona verde "¡YA!" */
+    --ya-texto: #062b16;       /* Reflejos: letras sobre el verde */
+    --pronto: #ff8a3d;         /* Reflejos: zona naranja "¡Muy pronto!" */
+    --pronto-texto: #2a1200;   /* Reflejos: letras sobre el naranja */
+    --encendida: #ffe066;      /* Memoria: casilla iluminada */
+    --fuente-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html { height: 100%; overscroll-behavior: none; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--texto);
+    font-family: var(--fuente-texto);
+    background: radial-gradient(circle at 20% 0%, var(--fondo-2), var(--fondo) 60%) fixed;
+    background-color: var(--fondo);
+    overflow: hidden;              /* el juego cabe en la pantalla: nunca hay que bajar */
+    overscroll-behavior: none;
+  }
+
+  /* La app ocupa exactamente el alto de la pantalla (100dvh = alto visible real en celulares).
+     Márgenes: --margen-arriba / --margen-lados / --margen-abajo (en px). En iPhone acostado se
+     agranda solo lo necesario para no meterse en la zona del "notch" ni en las esquinas
+     redondeadas (eso es lo que hace env(safe-area-inset-…)). */
+  .app {
+    --margen-arriba: 10px;
+    --margen-lados: 16px;
+    --margen-abajo: 12px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--margen-arriba) var(--margen-lados) var(--margen-abajo);
+    padding:
+      max(var(--margen-arriba), env(safe-area-inset-top))
+      max(var(--margen-lados), env(safe-area-inset-right))
+      max(var(--margen-abajo), env(safe-area-inset-bottom))
+      max(var(--margen-lados), env(safe-area-inset-left));
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* ---------- Encabezado ---------- */
+  header { text-align: center; flex: none; }
+  header h1 {
+    font-family: var(--fuente-titulo);
+    font-weight: 400;
+    font-size: clamp(2rem, 5.5vw, 3.2rem);
+    line-height: 1.05;
+    letter-spacing: 2px;
+    margin: 0;
+    color: #fff;
+    text-shadow: 3px 3px 0 var(--acento), 6px 6px 0 var(--acento-2);
+  }
+  header p { margin: 4px 0 0; color: var(--texto-suave); font-weight: 700; font-size: 0.95rem; }
+
+  /* ---------- Zona del juego (barra de progreso + pantallas) ---------- */
+  .juego { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+
+  /* HUD: la barra con el progreso de las 5 pruebas y los botones de sonido e inicio */
+  .hud {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px 6px 10px;
+    background: var(--panel);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    font-weight: 800;
+  }
+  #btnCasa { margin-left: 6px; }   /* un poco más separado del 🔊 para no tocarlo sin querer */
+  .pasos { flex: 1; min-width: 0; display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+  .paso {
+    flex: 1;
+    min-width: 0;
+    height: 32px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.12);
+    display: grid;
+    place-items: center;
+    font-size: 1.05rem;
+    font-family: var(--fuente-emoji);
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .paso.hecho { background: var(--acento); }
+  .paso.actual {
+    background: var(--acento-2);
+    box-shadow: 0 0 0 3px rgba(138, 92, 255, 0.35);                                /* (navegadores antiguos) */
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--acento-2) 35%, transparent);   /* el mismo color, transparente */
+  }
+
+  /* Aquí aparecen las pantallas (inicio, instrucciones, prueba, resultados…) */
+  .zona { flex: 1 1 0; min-height: 0; position: relative; }
+
+  /* ---------- Botones generales (iguales a "Crea tu Villano" y "No toques las paredes") ---------- */
+  .btn {
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 2px solid var(--borde);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--texto);
+    font: 900 1rem var(--fuente-texto);
+    cursor: pointer;
+    transition: transform 0.12s, filter 0.2s;
+    touch-action: manipulation;      /* en celular: sin zoom por doble toque */
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.15); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.principal { background: var(--acento); border-color: var(--acento); color: #fff; }
+  .btn.secundario { background: var(--acento-2); border-color: var(--acento-2); color: #fff; }
+  .btn.grande { font-size: 1.15rem; padding: 14px 24px; }
+  .btn.icono { padding: 6px 10px; font-size: 1.2rem; line-height: 1; min-width: 44px; min-height: 44px; }  /* 44 px = tamaño cómodo para el dedo */
+  .btn:focus-visible, .opcion:focus-visible, .ficha:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+  /* ---------- Pantallas ---------- */
+  .pantalla {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    padding: 4px 0;
+    overflow-y: auto;
+    border-radius: 16px;
+  }
+  .tarjeta {
+    margin: auto;
+    width: min(100%, 480px);
+    text-align: center;
+    padding: 18px 18px 20px;
+    border-radius: var(--radio);
+    border: 1px solid var(--borde);
+    background: linear-gradient(var(--panel), var(--panel)), var(--fondo);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  }
+  .tarjeta h2 {
+    font-family: var(--fuente-titulo);
+    font-weight: 400;
+    font-size: clamp(1.7rem, 5vw, 2.5rem);
+    letter-spacing: 1px;
+    margin: 0 0 8px;
+  }
+  .tarjeta p { margin: 6px 0; }
+  .record { color: var(--texto-suave); font-weight: 800; }
+  .atajos { color: var(--texto-suave); font-size: 0.85rem; }
+  .titulo-compacto { display: none; }   /* el título dentro de la tarjeta: sólo en celular acostado (ver más abajo) */
+  .sub { color: var(--texto-suave); font-weight: 800; }
+  .acciones { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; }
+  .nuevo-record { color: var(--ok); font-weight: 900; font-size: 1.15rem; }
+  .paso-num { color: var(--texto-suave); font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px; }
+  .emoji-grande { font-family: var(--fuente-emoji); font-size: clamp(3rem, 12vw, 4.4rem); line-height: 1.15; display: inline-block; animation: flotar 2.4s ease-in-out infinite; }
+  @keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  /* Lista de las 5 pruebas en la pantalla de inicio */
+  .lista-pruebas { list-style: none; padding: 0; margin: 4px 0 14px; text-align: left; display: grid; gap: 6px; }
+  .lista-pruebas li {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 6px 12px;
+  }
+  .lista-pruebas .emo { font-family: var(--fuente-emoji); font-size: 1.5rem; line-height: 1; flex: none; }
+  .lista-pruebas b { display: block; font-weight: 900; line-height: 1.15; }
+  .lista-pruebas small { display: block; color: var(--texto-suave); font-weight: 700; font-size: 0.82rem; line-height: 1.2; }
+  /* Empezar, récord y sonido, uno debajo del otro (con el celular acostado van en una fila: ver más abajo) */
+  .fila-inicio { display: flex; flex-direction: column; align-items: center; }
+
+  /* Tarjeta de instrucciones de cada prueba */
+  .mide { color: var(--ok); font-weight: 900; }
+  .instruccion { font-weight: 800; font-size: 1.05rem; line-height: 1.35; background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 10px 12px; }
+  .tarjeta .instruccion { margin: 10px 0 12px; }
+
+  /* Cuenta regresiva 3-2-1 */
+  .cuenta { margin: auto; text-align: center; }
+  .cuenta-prueba { font-weight: 900; color: var(--texto-suave); font-size: 1.1rem; margin: 0; }
+  .cuenta-numero {
+    display: block;
+    font: 400 clamp(6rem, 30vw, 11rem)/1 var(--fuente-titulo);
+    color: #fff;
+    text-shadow: 4px 4px 0 var(--acento), 8px 8px 0 var(--acento-2);
+  }
+  .cuenta-numero.pop { animation: pop 0.5s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  /* Resultado de una prueba */
+  .res-linea { font: 900 clamp(1.25rem, 4.6vw, 1.6rem)/1.25 var(--fuente-texto); margin: 6px 0 2px !important; }
+  .res-detalle { color: var(--texto-suave); font-weight: 800; font-size: 0.92rem; }
+  .chip-edad {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 2px;
+    padding: 6px 18px;
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(90deg, var(--acento), var(--acento-2));
+    font: 400 1.7rem var(--fuente-titulo);
+    letter-spacing: 1px;
+  }
+
+  /* ---------- El tablero de cada prueba ---------- */
+  /* user-select / touch-callout: al dejar el dedo apoyado no se selecciona texto ni sale
+     el menú "Copiar / Compartir" del celular encima de la prueba */
+  .pantalla-prueba { padding: 0; overflow: hidden; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  /* En pausa la prueba se tapa: así nadie busca el emoji diferente con el reloj detenido */
+  .tablero.en-pausa .area-prueba { visibility: hidden; }
+  .tablero {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px 12px;
+    background: var(--panel);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    min-height: 0;
+    outline: none;
+  }
+  .tablero-barra { flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; min-height: 30px; }
+  .tablero-barra b { font: 400 1.45rem/1.1 var(--fuente-titulo); letter-spacing: 1px; margin-right: auto; white-space: nowrap; }
+  .tablero-barra span { font-weight: 900; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .barra-tiempo { flex: none; height: 10px; border-radius: 99px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+  .barra-tiempo span { display: block; height: 100%; width: 100%; border-radius: inherit; background: var(--ok); }
+  .barra-tiempo.poco span { background: var(--peligro); }
+  .tiempo-poco { color: var(--peligro); }
+  .area-prueba { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+  .mensaje-prueba { flex: none; margin: 0; text-align: center; font-weight: 900; font-size: 1.08rem; min-height: 1.4em; }
+
+  /* Sello "¡Tiempo!" / "¡Listo!" que aparece al terminar una prueba */
+  .sello {
+    position: absolute; left: 50%; top: 50%; z-index: 4;
+    transform: translate(-50%, -50%) rotate(-6deg);
+    padding: 8px 26px; border-radius: 16px;
+    background: var(--acento); color: #fff;
+    font: 400 clamp(2.2rem, 9vw, 3.6rem) var(--fuente-titulo); letter-spacing: 2px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* Destello rojo cuando te equivocas */
+  .destello { position: absolute; inset: 0; z-index: 3; border-radius: var(--radio); background: var(--peligro); opacity: 0; pointer-events: none; }
+  .destello.activo { animation: destello 0.4s ease-out; }
+  @keyframes destello { from { opacity: 0.45; } to { opacity: 0; } }
+
+  /* Algo tiembla cuando te equivocas */
+  .temblando { animation: temblar 0.4s; }
+  @keyframes temblar {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-8px, 3px); }
+    40% { transform: translate(7px, -4px); }
+    60% { transform: translate(-5px, -2px); }
+    80% { transform: translate(4px, 3px); }
+  }
+
+  /* ---------- ⚡ Reflejos ---------- */
+  .zona-reflejos {
+    flex: 1 1 0;
+    min-height: 140px;
+    border-radius: 16px;
+    border: 2px solid var(--borde);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-align: center;
+    padding: 12px;
+    cursor: pointer;
+    touch-action: none;              /* en celular: el toque es para el juego, no para mover la página */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .zr-grande { font: 400 clamp(2.6rem, 11vw, 5rem)/1 var(--fuente-titulo); letter-spacing: 2px; }
+  .zr-chica { font-weight: 900; font-size: 1.05rem; }
+  .zona-reflejos.entre { background: rgba(255, 255, 255, 0.05); }
+  .zona-reflejos.espera { background: var(--espera); border-color: transparent; color: #fff; }
+  .zona-reflejos.ya { background: var(--ya); border-color: transparent; color: var(--ya-texto); }
+  .zona-reflejos.pronto { background: var(--pronto); border-color: transparent; color: var(--pronto-texto); }
+  .rondas { flex: none; list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .rondas li { padding: 6px 12px; border-radius: 99px; background: rgba(255, 255, 255, 0.08); font-weight: 900; font-variant-numeric: tabular-nums; }
+  .rondas li.actual { box-shadow: inset 0 0 0 2px var(--acento-2); }
+  .rondas li.castigo { color: var(--peligro); }
+
+  /* ---------- 🧩 Memoria y 👀 Vista: cuadrícula de emojis ---------- */
+  /* La caja mide lo que sobra de pantalla y la cuadrícula es el cuadrado más grande que cabe ahí */
+  .caja-cuadricula { flex: 1 1 0; min-height: 0; display: grid; place-items: center; position: relative; container-type: size; }
+  .cuadricula {
+    --columnas: 3;
+    width: 300px; height: 300px;                          /* (navegadores antiguos) */
+    width: min(100cqw, 100cqh); height: min(100cqw, 100cqh);
+    display: grid;
+    grid-template-columns: repeat(var(--columnas), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--columnas), minmax(0, 1fr));
+    gap: 8px;
+    gap: calc(min(100cqw, 100cqh) * 0.022);
+  }
+  .ficha {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border-radius: 14%;
+    border: 2px solid var(--borde);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--texto);
+    font-family: var(--fuente-emoji);
+    font-size: 2rem;
+    font-size: calc(min(100cqw, 100cqh) / var(--columnas) * 0.52);
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+  }
+  .ficha.encendida {
+    background: var(--encendida);
+    border-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 224, 102, 0.35), 0 0 28px rgba(255, 224, 102, 0.7);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--encendida) 35%, transparent), 0 0 28px color-mix(in srgb, var(--encendida) 70%, transparent);
+    transform: scale(1.06);
+  }
+  .ficha.tocada { animation: tocada 0.25s; }
+  @keyframes tocada { from { background: var(--acento-2); transform: scale(0.93); } }
+  .ficha.bien { background: rgba(61, 255, 168, 0.3); background: color-mix(in srgb, var(--ok) 30%, transparent); border-color: var(--ok); }
+  .ficha.mal { background: rgba(255, 45, 85, 0.3); background: color-mix(in srgb, var(--peligro) 30%, transparent); border-color: var(--peligro); }
+  /* "−2 s" que sube y desaparece al equivocarte en Vista */
+  .flotante {
+    position: absolute; left: 50%; top: 40%; z-index: 2;
+    transform: translate(-50%, 0);
+    font: 400 2.6rem var(--fuente-titulo); color: var(--peligro);
+    text-shadow: 0 2px 0 #000, 0 0 12px rgba(0, 0, 0, 0.6);
+    pointer-events: none; opacity: 0;
+  }
+  .flotante.activo { animation: subir 0.9s ease-out; }
+  @keyframes subir { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -50px); } }
+
+  /* ---------- 🧮 Lógica y 🎨 Concentración: botones de respuesta ---------- */
+  .caja-pregunta { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; padding: 0 4px; }
+  .pregunta { margin: 0; text-align: center; font: 900 clamp(1.2rem, 4.6vw, 1.85rem)/1.3 var(--fuente-texto); }
+  .opciones { flex: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .opcion {
+    position: relative;
+    min-height: 62px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 2px solid var(--borde);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--texto);
+    font: 800 1.12rem/1.2 var(--fuente-texto);
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .opcion .num { position: absolute; top: 5px; left: 9px; font-size: 0.72rem; font-weight: 900; color: var(--texto-suave); }
+  .opcion.bien { border-color: var(--ok); background: rgba(61, 255, 168, 0.2); background: color-mix(in srgb, var(--ok) 20%, transparent); }
+  .opcion.mal { border-color: var(--peligro); background: rgba(255, 45, 85, 0.22); background: color-mix(in srgb, var(--peligro) 22%, transparent); }
+  .muestra { width: 22px; height: 22px; border-radius: 50%; flex: none; border: 2px solid rgba(255, 255, 255, 0.5); }
+  .caja-palabra { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+  .palabra {
+    font: 400 clamp(3.4rem, 16vw, 6.5rem)/1 var(--fuente-titulo);
+    letter-spacing: 3px;
+    text-shadow: 0 4px 0 rgba(0, 0, 0, 0.45);
+  }
+  .nueva { animation: aparecer 0.2s ease-out; }
+  @keyframes aparecer { from { opacity: 0.2; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+  @media (hover: hover) {
+    .opcion:hover { border-color: var(--acento-2); }
+    .ficha:hover { border-color: var(--acento-2); }
+  }
+
+  /* ---------- Pausa (aparece encima de la prueba) ---------- */
+  .pantalla.pausa { z-index: 6; padding: 12px; background: rgba(12, 4, 22, 0.88); cursor: pointer; }
+
+  /* ---------- Resultado final ---------- */
+  .tarjeta.final { width: min(100%, 920px); padding: 16px 18px 18px; }
+  .final-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 26px; align-items: center; }
+  .etiqueta { display: block; color: var(--texto-suave); font-weight: 800; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+  .edad-grande {
+    font: 400 clamp(4.4rem, 15vw, 7.2rem)/0.95 var(--fuente-titulo);
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 4px 4px 0 var(--acento), 8px 8px 0 var(--acento-2);
+    font-variant-numeric: tabular-nums;
+    margin: 4px 0 6px;
+  }
+  .edad-grande small { font-size: 0.34em; margin-left: 8px; letter-spacing: 1px; text-shadow: 2px 2px 0 var(--acento); }
+  .frase-final { font-weight: 900; font-size: 1.2rem; line-height: 1.3; }
+  .descripcion { color: var(--texto-suave); font-weight: 700; }
+  .insignia {
+    display: inline-block; margin: 6px 4px 0 !important; padding: 4px 14px; border-radius: 999px;
+    background: var(--amarillo); color: #1a0b2e; font-weight: 900;
+  }
+  .desglose { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .fila { display: grid; grid-template-columns: minmax(0, 9em) minmax(0, 1fr) 2.4em; align-items: center; gap: 10px; text-align: left; }
+  .fila-nombre { font-weight: 900; line-height: 1.15; min-width: 0; white-space: nowrap; }
+  .fila-nombre small { display: block; color: var(--texto-suave); font-weight: 700; font-size: 0.8rem; }
+  .fila-barra { height: 14px; border-radius: 99px; background: rgba(255, 255, 255, 0.12); overflow: hidden; }
+  .fila-barra span { display: block; height: 100%; width: 0; border-radius: inherit; transition: width 0.9s cubic-bezier(.2, .8, .2, 1); }
+  .revelado .fila-barra span { width: var(--ancho); }
+  .fila-barra .buena { background: var(--ok); }
+  .fila-barra .media { background: var(--amarillo); }
+  .fila-barra .mala { background: var(--peligro); }
+  .fila-edad { font: 400 1.55rem/1 var(--fuente-titulo); text-align: right; letter-spacing: 1px; }
+  .poderes { display: grid; gap: 4px; margin-top: 10px !important; font-weight: 900; text-align: left; }
+  /* Los botones del final quedan SIEMPRE a la vista, pegados abajo: si el resultado no cabe en la
+     pantalla (celular chico o acostado), lo de arriba se desliza por detrás de ellos.
+     El fondo es el mismo color de la tarjeta (--fondo con un 6 % de blanco), con un degradado arriba. */
+  .final .acciones .btn { min-height: 44px; }
+  .texto-corto { display: none; }
+  .tarjeta.final .acciones {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin: 6px -18px -18px;
+    padding: 18px 18px 14px;
+    border-radius: 0 0 var(--radio) var(--radio);
+    background: var(--fondo);
+    background: linear-gradient(transparent, color-mix(in srgb, var(--fondo) 94%, #fff) 16px);
+  }
+  .revelable { opacity: 0; transform: translateY(8px); transition: opacity 0.5s, transform 0.5s; }
+  .revelado .revelable { opacity: 1; transform: none; }
+
+  /* ---------- Aviso flotante (toast) ---------- */
+  .aviso {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    bottom: calc(24px + env(safe-area-inset-bottom));   /* sobre la barra de inicio del iPhone */
+    transform: translate(-50%, 140%);
+    background: #fff;
+    color: #1a0b2e;
+    padding: 12px 20px;
+    border-radius: 22px;
+    width: max-content;            /* sin esto, en celular el aviso queda angosto (la mitad de la pantalla) */
+    font-weight: 900;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s, opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+  }
+  .aviso.visible { transform: translate(-50%, 0); opacity: 1; }
+
+  /* Texto sólo para lectores de pantalla (personas ciegas) */
+  .solo-lector { position: absolute; top: 0; left: 0; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* En pantallas angostas: el resultado final va en una sola columna */
+  @media (max-width: 760px) {
+    .final-grid { grid-template-columns: 1fr; gap: 10px; }
+  }
+  /* En celular: todo un poco más compacto */
+  @media (max-width: 600px) {
+    .app { --margen-arriba: 8px; --margen-lados: 12px; --margen-abajo: 10px; gap: 6px; }
+    header h1 { font-size: clamp(1.5rem, 7vw, 2.2rem); text-shadow: 2px 2px 0 var(--acento), 4px 4px 0 var(--acento-2); }   /* cabe en una línea */
+    header p { font-size: 0.82rem; }
+    .juego { gap: 6px; }
+    .hud { padding: 5px 6px 5px 8px; gap: 6px; }
+    .paso { height: 30px; font-size: 0.95rem; }
+    .tarjeta { padding: 14px 12px 16px; }
+    .tarjeta.final { padding: 12px 12px 14px; }
+    .btn.grande { font-size: 1.05rem; padding: 12px 20px; }
+    .tablero { padding: 8px 8px 10px; gap: 6px; }
+    .tablero-barra b { font-size: 1.25rem; }
+    .opciones { gap: 8px; }
+    .opcion { min-height: 58px; font-size: 1.02rem; padding: 8px 8px; }
+    .acciones { gap: 8px; margin-top: 10px; }
+    .acciones .btn { padding: 11px 14px; }
+    .frase-final { font-size: 1.08rem; }
+    .fila { grid-template-columns: minmax(0, 9.6em) minmax(0, 1fr) 2.2em; gap: 8px; }
+    .final .acciones .btn { font-size: 0.95rem; padding: 10px 12px; }
+    /* los 4 botones del final en 2 filas de 2, estirados para llenar el ancho (más ordenado y más bajo) */
+    .tarjeta.final .acciones { margin: 6px -12px -14px; padding: 16px 12px 12px; }
+    .final .acciones .btn { flex: 1 1 auto; white-space: nowrap; }
+    .texto-largo { display: none; }
+    .texto-corto { display: inline; }
+    .final .descripcion { font-size: 0.92rem; }
+    .pregunta { font-size: clamp(1.3rem, 6vw, 1.7rem); }
+  }
+  /* Pantallas no muy altas: se esconde el subtítulo para que las pruebas tengan más espacio.
+     🔧 Cambia 700px si quieres que el subtítulo se vea en más (o menos) pantallas. */
+  @media (max-height: 700px) {
+    header p { display: none; }
+    .lista-pruebas { gap: 4px; margin-bottom: 10px; }
+    .lista-pruebas li { padding: 4px 10px; }
+    .tarjeta h2 { margin-bottom: 4px; }
+  }
+  /* Pantallas bajitas (celular acostado): sin encabezado, y la pantalla de inicio
+     muestra el título dentro de la tarjeta para que todos los botones quepan */
+  @media (max-height: 500px) {
+    header { display: none; }
+    .app { --margen-arriba: 6px; --margen-abajo: 6px; gap: 6px; }
+    .titulo-compacto {
+      display: block; margin: 0 0 6px; color: #fff;
+      font: 400 1.7rem/1.05 var(--fuente-titulo); letter-spacing: 2px;
+      text-shadow: 2px 2px 0 var(--acento), 4px 4px 0 var(--acento-2);
+    }
+    #inicioTitulo { display: none; }
+    .tarjeta { width: min(100%, 640px); padding: 10px 14px 12px; }
+    .lista-pruebas { grid-template-columns: 1fr 1fr; }
+    .emoji-grande { font-size: 2.4rem; }
+    .acciones { margin-top: 8px; }
+    .tarjeta p { margin: 4px 0; }
+    .btn.grande { padding: 10px 22px; }
+    .opciones { grid-template-columns: repeat(var(--opciones, 4), minmax(0, 1fr)); }   /* todas las respuestas en una fila */
+    .opcion { min-height: 52px; }
+    /* Resultado de cada prueba: sin el emoji grande ni "Prueba 1 de 5", para que "Siguiente prueba" quepa */
+    #resEmoji, #resPaso { display: none; }
+    .chip-edad { font-size: 1.3rem; margin: 4px 0 0; padding: 4px 16px; }
+    /* Inicio: "Empezar" y "Sonido" en la misma fila, y el récord debajo */
+    .fila-inicio { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 0 10px; }
+    .fila-inicio .record { order: 3; flex-basis: 100%; }
+    /* Resultado final: siempre en 2 columnas, todo más compacto, y los botones en una sola fila */
+    .final-grid { grid-template-columns: 1fr 1fr; gap: 6px 20px; }
+    .tarjeta.final { padding: 10px 16px 12px; }
+    .edad-grande { font-size: 4rem; margin: 0 0 2px; }
+    .frase-final { font-size: 1rem; }
+    .final .descripcion { font-size: 0.85rem; }
+    .insignia { margin-top: 2px !important; padding: 2px 12px; }
+    .desglose { gap: 4px; }
+    .fila-edad { font-size: 1.3rem; }
+    .poderes { margin-top: 6px !important; font-size: 0.92rem; }
+    .tarjeta.final .acciones { display: flex; flex-wrap: nowrap; margin: 4px -16px -12px; padding: 12px 16px 8px; }
+    .final .acciones .btn { padding: 9px 14px; font-size: 0.92rem; white-space: nowrap; }
+  }
+  /* Con pantalla táctil no hay teclado: no se muestran los atajos de teclas */
+  @media (hover: none) {
+    .atajos, .opcion .num { display: none; }
+  }
+
+  /* Respeta a quien prefiere menos animaciones: sin temblores, destellos ni saltos */
+  @media (prefers-reduced-motion: reduce) {
+    .temblando, .destello.activo, .flotante.activo, .ficha.tocada, .nueva, .cuenta-numero.pop, .emoji-grande { animation: none; }
+    .btn, .aviso, .ficha, .opcion, .paso, .revelable, .fila-barra span { transition: none; }
+    .ficha.encendida { transform: none; }
+    .revelable { opacity: 1; transform: none; }
+  }
+
+/* ===== Botón "¡Aquí hay más!" abajo a la derecha, con el logo WF ===== */
+/* CAMBIAR: 56px = tamaño del botón; 12px = distancia a los bordes; 118% = zoom del logo (la imagen wf.png vive en el repo wafflefun.github.io) */
+.ma-b {
+  left: auto !important; top: auto !important; transform: none !important;
+  right: 12px !important;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+  width: 56px !important; height: 56px !important; min-width: 0 !important; padding: 0 !important;
+  border: none !important; border-radius: 50% !important;
+  font-size: 0 !important; line-height: 0 !important; color: transparent !important;
+  background: url("https://wafflefun.github.io/wf.png") center / 118% no-repeat !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .4) !important;
+}
+.ma-b > * { display: none !important; }
+/* Solo se ve en el inicio y en el resultado final (no estorba en las pruebas) */
+body:not(.con-boton) .ma-b { display: none !important; }
+/* Deja espacio abajo para que el botón no tape los botones del juego */
+body.con-boton .app { --margen-abajo: 74px; }
 </style>
 </head>
 <body>
-<div id="stage"><div id="wrap"><canvas id="c"></canvas></div></div>
+<div class="app">
+  <header>
+    <!-- 🔧 TEXTOS: el título y el subtítulo se escriben desde el objeto TEXTOS -->
+    <h1 id="titulo"></h1>
+    <p id="subtitulo"></p>
+  </header>
+
+  <main class="juego" id="juego">
+    <!-- HUD: progreso de las pruebas (una pastilla por prueba), sonido e inicio -->
+    <div class="hud" id="hud">
+      <ol class="pasos" id="pasos"></ol>
+      <button class="btn icono" id="btnSonido" type="button"></button>
+      <button class="btn icono" id="btnCasa" type="button" hidden></button>
+    </div>
+
+    <div class="zona" id="zona">
+      <!-- (1) Pantalla de inicio -->
+      <section class="pantalla" id="pantallaInicio" aria-labelledby="inicioTitulo">
+        <div class="tarjeta">
+          <p class="titulo-compacto" id="tituloCompacto" aria-hidden="true"></p>
+          <h2 id="inicioTitulo"></h2>
+          <ul class="lista-pruebas" id="listaPruebas"></ul>
+          <div class="fila-inicio">
+            <button class="btn principal grande" id="btnEmpezar" type="button" data-principal></button>
+            <p class="record" id="textoRecord"></p>
+            <button class="btn" id="btnSonidoInicio" type="button"></button>
+          </div>
+          <p class="atajos" id="textoAtajos"></p>
+        </div>
+      </section>
+
+      <!-- (2) Instrucciones de cada prueba -->
+      <section class="pantalla" id="pantallaIntro" aria-labelledby="introNombre" hidden>
+        <div class="tarjeta">
+          <p class="paso-num" id="introPaso"></p>
+          <div class="emoji-grande" id="introEmoji" aria-hidden="true"></div>
+          <h2 id="introNombre"></h2>
+          <p class="mide" id="introMide"></p>
+          <p class="instruccion" id="introInstrucciones"></p>
+          <p class="atajos" id="introTeclado"></p>
+          <button class="btn principal grande" id="btnListo" type="button" data-principal></button>
+        </div>
+      </section>
+
+      <!-- (3) Cuenta regresiva 3-2-1 -->
+      <section class="pantalla" id="pantallaCuenta" hidden>
+        <div class="cuenta">
+          <p class="cuenta-prueba" id="cuentaPrueba"></p>
+          <span class="cuenta-numero" id="cuentaNumero" aria-hidden="true"></span>
+          <p class="sub" id="cuentaTexto"></p>
+        </div>
+      </section>
+
+      <!-- (4) La prueba (cada prueba dibuja lo suyo dentro de "areaPrueba") -->
+      <section class="pantalla pantalla-prueba" id="pantallaPrueba" hidden>
+        <div class="tablero" id="tablero" tabindex="-1">
+          <div class="tablero-barra">
+            <b id="pruebaNombre"></b>
+            <span id="pruebaEstado"></span>
+            <span id="pruebaTiempo"></span>
+          </div>
+          <div class="barra-tiempo" id="barraTiempo" aria-hidden="true" hidden><span id="barraTiempoRelleno"></span></div>
+          <div class="area-prueba" id="areaPrueba"></div>
+          <div class="destello" id="destello" aria-hidden="true"></div>
+          <div class="sello" id="sello" hidden></div>
+        </div>
+      </section>
+
+      <!-- (5) Resultado de una prueba -->
+      <section class="pantalla" id="pantallaResultado" aria-labelledby="resTitulo" hidden>
+        <div class="tarjeta">
+          <p class="paso-num" id="resPaso"></p>
+          <div class="emoji-grande" id="resEmoji" aria-hidden="true"></div>
+          <h2 id="resTitulo"></h2>
+          <p class="res-linea" id="resLinea"></p>
+          <p class="res-detalle" id="resDetalle"></p>
+          <span class="chip-edad" id="resEdad"></span>
+          <p class="sub" id="resComentario"></p>
+          <div class="acciones">
+            <button class="btn principal grande" id="btnSiguientePrueba" type="button" data-principal></button>
+            <button class="btn" id="btnRepetirPrueba" type="button" hidden></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- (6) Resultado final -->
+      <section class="pantalla" id="pantallaFinal" aria-labelledby="finalEtiqueta" hidden>
+        <div class="tarjeta final">
+          <div class="final-grid">
+            <div>
+              <span class="etiqueta" id="finalEtiqueta"></span>
+              <div class="edad-grande" aria-hidden="true"><span id="finalEdad">0</span><small id="finalAnos"></small></div>
+              <p class="frase-final revelable" id="finalFrase"></p>
+              <p class="descripcion revelable" id="finalDescripcion"></p>
+              <p class="nuevo-record revelable" id="finalRecord" hidden></p>
+              <p class="insignia revelable" id="finalRobot" hidden></p>
+            </div>
+            <!-- "revelable": el desglose aparece cuando el número termina de subir (no antes, para no arruinar la sorpresa) -->
+            <div class="revelable">
+              <span class="etiqueta" id="desgloseTitulo"></span>
+              <ul class="desglose" id="desglose"></ul>
+              <p class="poderes revelable"><span id="superPoder"></span><span id="aEntrenar"></span></p>
+            </div>
+          </div>
+          <!-- data-principal: el botón que recibe el foco al aparecer la pantalla. Aquí es Compartir y no
+               "Jugar de nuevo", para que un Enter de más no borre el resultado antes de verlo. -->
+          <div class="acciones">
+            <button class="btn secundario" id="btnCompartir" type="button" data-principal></button>
+            <button class="btn" id="btnDescargar" type="button"></button>
+            <button class="btn principal" id="btnOtra" type="button"></button>
+            <button class="btn" id="btnInicio" type="button"></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- (7) Pausa: aparece ENCIMA de la prueba si cambias de pestaña -->
+      <section class="pantalla pausa" id="pantallaPausa" aria-labelledby="pausaTitulo" hidden>
+        <div class="tarjeta">
+          <h2 id="pausaTitulo"></h2>
+          <p class="sub" id="pausaTexto"></p>
+          <button class="btn principal grande" id="btnSeguir" type="button"></button>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="aviso" id="aviso" role="status"></div>
+<!-- Aquí se "anuncian" los mensajes para lectores de pantalla -->
+<div class="solo-lector" id="anuncio" aria-live="polite"></div>
+
 <script>
-(() => {
 'use strict';
 
-/* ================= CONSTANTES ================= */
-let W = 1100, H = 619;            // resolución lógica (horizontal 1100x619, vertical 620xN)
-let PORTRAIT = false;
-const TH = 36;                    // grosor de cada waffle
-let HOLD_Y = 238;                 // posición (pantalla) del waffle en la garra
-let BASE_W = 190;                 // ancho inicial
-let PX = 550;                     // centro de la torre
-let PY = 528;                     // centro del plato
-let BASE_Y = 490;                 // y de la cara superior del primer waffle
-let CAM_LINE = 410;               // altura a la que se mantiene la cima de la torre
-let MARGIN = 140;                 // margen del recorrido de la garra
-let SPD = 1;                      // escala de velocidad según ancho
-const GRAV = 2200;
-const FONT = '"Arial Rounded MT Bold","Nunito","Trebuchet MS","Segoe UI",Helvetica,Arial,sans-serif';
-const TAU = Math.PI * 2;
+/* =====================================================================
+   🔧 CONFIG — ajustes generales del juego
+   (cada prueba tiene además su propia sección más abajo:
+    🔧 REFLEJOS, 🔧 MEMORIA, 🔧 VISTA, 🔧 LÓGICA, 🔧 CONCENTRACIÓN)
+   ===================================================================== */
+const CONFIG = {
+  // 📤 COMPARTIR
+  MARCA: 'noparess · Tu edad mental',                      // texto chico al pie de la imagen del resultado
+  URL_COMPARTIR: 'https://wafflefun.github.io/noparess/',  // link que se comparte junto al resultado
 
-const stage = document.getElementById('stage');
-const cv = document.getElementById('c');
-const ctx = cv.getContext('2d');
-const wrap = document.getElementById('wrap');
-let sc = 1;
+  // 🔊 SONIDO (ver también 🔧 SONIDOS)
+  SONIDO: true,            // true = la primera vez el sonido parte encendido; false = parte apagado (el jugador lo puede prender)
+  VOLUMEN: 0.25,           // volumen general: 0 = mudo, 1 = máximo
 
-/* ================= UTILIDADES ================= */
-const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-function rnd(seed) {
-  let t = (seed | 0) + 0x6D2B79F5;
-  t = Math.imul(t ^ (t >>> 15), t | 1);
-  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-}
-function easeOutBack(t) { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
-function rr(g, x, y, w, h, r) {
-  g.beginPath(); g.moveTo(x + r, y);
-  g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
-  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
-}
-function makeLayer(w, h, s) {
-  const c = document.createElement('canvas');
-  c.width = Math.round(w * s); c.height = Math.round(h * s);
-  const g = c.getContext('2d'); g.scale(s, s);
-  return { c, g };
-}
-function txt(c, s, x, y, size, fill, stroke, lw, align) {
-  c.font = '900 ' + size + 'px ' + FONT;
-  c.textAlign = align || 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
-  if (stroke) { c.lineWidth = lw; c.strokeStyle = stroke; c.strokeText(s, x, y); }
-  c.fillStyle = fill; c.fillText(s, x, y);
-}
-function star(c, x, y, r, rot) {
-  c.beginPath();
-  for (let i = 0; i < 10; i++) {
-    const a = rot + i * Math.PI / 5 - Math.PI / 2, rad = i % 2 ? r * 0.45 : r;
-    c.lineTo(x + Math.cos(a) * rad, y + Math.sin(a) * rad);
-  }
-  c.closePath();
-}
+  // ⏱️ TIEMPOS generales (en milisegundos: 1000 = 1 segundo).
+  //    Los tiempos de cada prueba están dentro de su sección (busca ⏱️ más abajo).
+  CUENTA_DESDE: 3,         // números de la cuenta regresiva antes de cada prueba (3 = "3, 2, 1")
+  CUENTA_PASO: 800,        // ms que dura cada número de la cuenta regresiva
+  PAUSA_FIN_PRUEBA: 750,   // ms que se ve el sello "¡Tiempo!" o "¡Listo!" antes del resultado de la prueba
+  TIEMPO_CONTADOR: 1800,   // ms que tarda el número del final en "subir" hasta tu edad
+  TIEMPO_AVISO: 2400,      // ms que se ve el aviso de abajo ("¡Imagen descargada!", etc.)
+  TIEMPO_VIBRAR: 120,      // ms que vibra el celular al equivocarte (si el celular lo permite). 0 = nunca vibra
+  ULTIMOS_SEGUNDOS: 5,     // segundos: cuando queda menos que esto, la barra de tiempo se pone roja
+  BLOQUEO_TOQUE: 400,      // ms que los botones de una pantalla recién aparecida NO responden (así un doble toque
+                           //    en "Empezar" o "Siguiente prueba" no se salta las instrucciones). 0 = sin bloqueo
+  TIEMPO_SALIR: 2500,      // ms que tienes para tocar 🏠 por SEGUNDA vez y salir de una partida a medias
 
-/* ================= RESIZE ================= */
-function resize() {
-  const aw = Math.max(200, stage.clientWidth - 12), ah = Math.max(200, stage.clientHeight - 12);
-  const portrait = ah > aw;
-  let nw, nh, cw, ch;
-  if (!portrait) { nw = 1100; nh = 619; cw = Math.min(aw, 1100, ah * 16 / 9); ch = cw * 9 / 16; }
-  else {
-    nw = 620; nh = clamp(Math.round(620 * ah / aw / 20) * 20, 820, 1180);
-    cw = Math.min(aw, ah * nw / nh, 760); ch = cw * nh / nw;
-  }
-  wrap.style.width = Math.round(cw) + 'px'; wrap.style.height = Math.round(ch) + 'px';
-  const dpr = window.devicePixelRatio || 1;
-  const maxPx = portrait ? 1000 : 1650;
-  const px = Math.max(360, Math.min(Math.round(cw * dpr), maxPx));
-  cv.width = px; cv.height = Math.round(px * nh / nw); sc = px / nw;
-  if (nw !== W || nh !== H || !bg) applyLayout(nw, nh);
-}
-let rzT = 0;
-function queueResize() { cancelAnimationFrame(rzT); rzT = requestAnimationFrame(resize); }
-window.addEventListener('resize', queueResize);
-window.addEventListener('orientationchange', () => setTimeout(queueResize, 120));
-if (window.visualViewport) window.visualViewport.addEventListener('resize', queueResize);
+  // 🛠️ AYUDA PARA EL DUEÑO
+  FACTOR_RAPIDO: 4,        // con ?rapido=1 en la dirección, los tiempos se dividen por este número
+                           //    (menos REFLEJOS.LIMITE y TIEMPO_AVISO, que no cambian)
 
-/* ================= AUDIO ================= */
-let ac = null, master = null, noiseBuf = null, muted = false;
-try { muted = localStorage.getItem('wdc_muted') === '1'; } catch (e) {}
-function ensureAudio() {
-  try {
-    if (!ac) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      ac = new AC(); master = ac.createGain(); master.gain.value = 0.55; master.connect(ac.destination);
-      const b = ac.createBuffer(1, 1, 22050), s = ac.createBufferSource();
-      s.buffer = b; s.connect(ac.destination); s.start(0);
-      noiseBuf = ac.createBuffer(1, Math.floor(ac.sampleRate * 0.15), ac.sampleRate);
-      const d = noiseBuf.getChannelData(0);
-      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    }
-    if (ac.state === 'suspended') ac.resume();
-  } catch (e) {}
-}
-function tone(f, f2, d, type, v, delay) {
-  if (!ac || muted) return;
-  try {
-    const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime + (delay || 0);
-    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t0);
-    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t0 + d);
-    g.gain.setValueAtTime(0.0001, t0);
-    g.gain.exponentialRampToValueAtTime(v, t0 + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
-    o.connect(g); g.connect(master); o.start(t0); o.stop(t0 + d + 0.03);
-  } catch (e) {}
-}
-function noise(v, d, freq) {
-  if (!ac || muted || !noiseBuf) return;
-  try {
-    const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain(), t0 = ac.currentTime;
-    s.buffer = noiseBuf; f.type = 'lowpass'; f.frequency.value = freq || 900;
-    g.gain.setValueAtTime(v, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
-    s.connect(f); f.connect(g); g.connect(master); s.start(t0); s.stop(t0 + d + 0.02);
-  } catch (e) {}
-}
-const sfx = {
-  release() { tone(640, 300, 0.1, 'triangle', 0.14); },
-  land() { tone(190, 70, 0.14, 'sine', 0.38); noise(0.18, 0.08, 700); },
-  cut() { tone(320, 140, 0.12, 'square', 0.05, 0.03); },
-  perfect() { [660, 880, 1175, 1568].forEach((f, i) => tone(f, null, 0.2, 'triangle', 0.15, i * 0.07)); },
-  over() { tone(400, 70, 0.85, 'sawtooth', 0.16); tone(200, 50, 0.95, 'square', 0.09, 0.1); noise(0.2, 0.4, 500); }
+  // 💾 Memoria del navegador
+  CLAVE_RECORD: 'tuEdadMental.record',     // nombre con que se guarda tu mejor (menor) edad
+  CLAVE_SONIDO: 'tuEdadMental.silencio',   // nombre con que se guarda si el sonido está apagado
 };
-function toggleSound() {
-  muted = !muted;
-  try { localStorage.setItem('wdc_muted', muted ? '1' : '0'); } catch (e) {}
-  if (!muted) { ensureAudio(); tone(660, 880, 0.1, 'triangle', 0.12); }
-}
 
-/* ================= FONDO (pre-render, desenfocado) ================= */
-let bg = null, table = null;
+/* =====================================================================
+   🔧 COLORES de la imagen del resultado (la "carta" que se descarga)
+   Usa siempre el formato '#rrggbb'. Los colores de la página están en
+   el CSS (arriba, en :root).
+   ===================================================================== */
+const COLORES_CARTA = {
+  fondo: '#12061f',        // fondo (igual que --fondo de la página)
+  fondo2: '#2b0b45',       // segundo color del degradado (igual que --fondo-2)
+  rayos: '#ffffff',        // rayos de cómic del fondo (se dibujan casi transparentes)
+  borde: '#8a5cff',        // marco de la imagen
+  titulo: '#ffffff',       // título y número de la edad
+  sombra1: '#ff3b8d',      // primera sombra del título (rosada)
+  sombra2: '#8a5cff',      // segunda sombra del título (morada)
+  texto: '#f6ecff',        // textos normales
+  suave: '#bda9d6',        // textos secundarios (puntaje de cada prueba, marca)
+  caja: '#000000',         // fondo de las cajas (se dibuja transparente)
+  barraFondo: '#ffffff',   // fondo de las barras (se dibuja transparente)
+  barraBuena: '#3dffa8',   // barra de una prueba con edad "joven"
+  barraMedia: '#ffd23f',   // barra de una prueba con edad "más o menos"
+  barraMala: '#ff2d55',    // barra de una prueba con edad "vieja"
+  insignia: '#ffd23f',     // fondo de la insignia "¿Eres un robot? 🤖"
+  insigniaTexto: '#1a0b2e',// letras de la insignia
+};
 
-let cordTop = -110;
-function lamp(g, x, y, s) {
-  const gl = g.createRadialGradient(x, y + 30 * s, 5, x, y + 30 * s, 110 * s);
-  gl.addColorStop(0, 'rgba(255,232,150,.75)'); gl.addColorStop(1, 'rgba(255,232,150,0)');
-  g.fillStyle = gl; g.fillRect(x - 120 * s, y - 80 * s, 240 * s, 240 * s);
-  g.strokeStyle = '#4a2b18'; g.lineWidth = 3; g.beginPath(); g.moveTo(x, cordTop); g.lineTo(x, y - 8 * s); g.stroke();
-  g.fillStyle = '#f4cf78'; g.beginPath(); g.moveTo(x - 36 * s, y + 32 * s);
-  g.quadraticCurveTo(x - 32 * s, y - 8 * s, x, y - 10 * s); g.quadraticCurveTo(x + 32 * s, y - 8 * s, x + 36 * s, y + 32 * s);
-  g.closePath(); g.fill();
-  g.fillStyle = '#fff6c8'; g.beginPath(); g.ellipse(x, y + 32 * s, 30 * s, 8 * s, 0, 0, TAU); g.fill();
-}
-function leafPlant(g, x, y, len, cols, n) {
-  for (let i = 0; i < n; i++) {
-    const a = -Math.PI / 2 + (i - (n - 1) / 2) * (2.3 / n) + Math.sin(i * 7) * 0.12;
-    g.save(); g.translate(x, y); g.rotate(a + Math.PI / 2);
-    g.fillStyle = cols[i % cols.length];
-    g.beginPath(); g.ellipse(0, -len * 0.55, len * 0.17, len * 0.55, 0, 0, TAU); g.fill();
-    g.restore();
+
+/* =====================================================================
+   🔧 REFLEJOS ⚡ — la zona se pone roja ("Espera…") y de repente verde
+   ("¡YA!"): hay que tocarla lo más rápido posible.
+   Puntaje: el PROMEDIO de las rondas en ms. Aquí MENOS es mejor.
+   ===================================================================== */
+CONFIG.REFLEJOS = {
+  RONDAS: 3,               // cuántas veces hay que reaccionar
+  // ⏱️ TIEMPOS (ms)
+  ESPERA_MIN: 1500,        // ms: lo MENOS que dura el rojo antes del verde
+  ESPERA_MAX: 4000,        // ms: lo MÁS que dura el rojo (el juego elige un tiempo al azar entre los dos)
+  LIMITE: 2000,            // ms: si no tocas el verde en este tiempo, la ronda vale LIMITE ms ("¡Muy lento!")
+  PAUSA_ENTRE_RONDAS: 1100,// ms que se ve tu tiempo antes de que empiece la siguiente ronda
+  PAUSA_PRONTO: 1300,      // ms que se ve "¡Muy pronto!" antes de repetir la ronda
+  // 🚫 TOCAR ANTES DE TIEMPO
+  MINIMO_HUMANO: 100,      // ms: nadie reacciona más rápido que esto; si pasa, es "adivinar" y cuenta como "¡Muy pronto!"
+  MAX_PRONTOS: 3,          // si tocas en rojo estas veces en UNA misma ronda, esa ronda vale CASTIGO_PRONTO
+  CASTIGO_PRONTO: 1000,    // ms que vale una ronda castigada
+  SOSPECHA_ROBOT: 150,     // ms: si tu promedio es menor que esto, el final dice "¿Eres un robot? 🤖" (es broma, no castiga)
+  // 🎯 PUNTAJE → EDAD (ver 🔧 EDADES)
+  EXCELENTE: 220,          // ms: un promedio así (o menor) da la edad más joven
+  MALO: 550,               // ms: un promedio así (o mayor) da la edad más vieja
+};
+
+
+/* =====================================================================
+   🔧 MEMORIA 🧩 — se iluminan casillas una por una y hay que repetir
+   el orden. Si aciertas, la siguiente secuencia es 1 más larga.
+   Puntaje: el largo de la secuencia más larga que completaste.
+   ===================================================================== */
+CONFIG.MEMORIA = {
+  INICIO: 3,               // largo de la primera secuencia (cuántas casillas se iluminan)
+  MAXIMO: 10,              // largo máximo: si completas una secuencia de este largo, la prueba termina
+  VIDAS: 2,                // vidas (❤️): cada error gasta una y, si te queda alguna, sale OTRA secuencia del
+                           //    mismo largo. Al quedarte sin vidas termina la prueba. Con 2 se perdona 1 error
+                           //    (el 2.º termina); para perdonar 2 errores, pon 3.
+  // ⏱️ TIEMPOS (ms)
+  ENCENDIDA: 550,          // ms que se ilumina cada casilla
+  APAGADA: 250,            // ms de pausa entre una casilla y la siguiente
+  PAUSA_ANTES: 600,        // ms de espera antes de empezar a mostrar cada secuencia
+  PAUSA_DESPUES: 900,      // ms que se ve "¡Bien!" o "¡Ups!" antes de la siguiente secuencia
+  ESPERA_MAXIMA: 8000,     // ms: si no tocas nada en este tiempo, cuenta como error (así nadie se queda pegado)
+  // 🎯 PUNTAJE → EDAD (ver 🔧 EDADES)
+  EXCELENTE: 8,            // largo de una memoria de elefante (da la edad más joven; un adulto promedio llega a 5 o 6)
+  MALO: 2,                 // largo de alguien muy distraído (da la edad más vieja). Con 2, completar sólo
+                           //    la primera secuencia (3) ya da algo mejor que no completar ninguna (0)
+};
+// Los emojis de las casillas: en cada partida se eligen 9 al azar de esta lista.
+// Pon al menos 9, todos distintos y fáciles de diferenciar.
+const EMOJIS_MEMORIA = ['🍎', '🐶', '⭐', '🚗', '🎈', '🐸', '🍕', '⚽', '🌙', '🎸', '🦄', '🍩', '🚀', '🌵', '🐙'];
+// 💡 IDEA: modo "Simon" con sonidos: en vez de emojis, casillas de colores que suenan cada una
+//          con su nota (las notas ya existen: SONIDOS.NOTAS_MEMORIA) y se juega con los ojos cerrados.
+
+
+/* =====================================================================
+   🔧 VISTA 👀 — "Encuentra al diferente": una cuadrícula de emojis
+   iguales con UNO distinto. Cada vez que lo encuentras, sale otra
+   cuadrícula (y cada tanto, más grande).
+   Puntaje: cuántos encontraste antes de que se acabe el tiempo.
+   ===================================================================== */
+CONFIG.VISTA = {
+  TIEMPO: 20,              // ⏱️ segundos que dura la prueba
+  CASTIGO: 1,              // ⏱️ segundos que pierdes por tocar un emoji equivocado
+  PAUSA_ACIERTO: 250,      // ⏱️ ms entre que encuentras uno y aparece la siguiente cuadrícula
+  COLUMNAS_INICIO: 3,      // la primera cuadrícula es de 3 x 3
+  COLUMNAS_MAX: 6,         // la más grande es de 6 x 6 (más grande queda muy chica en celular)
+  SUBIR_CADA: 2,           // cada cuántos encontrados crece la cuadrícula (3x3 → 4x4 → 5x5 → 6x6)
+  CASILLA_MINIMA: 44,      // px: tamaño mínimo de cada emoji para tocarlo cómodo. Si la pantalla es chica (celular
+                           //     acostado), la cuadrícula deja de crecer antes de que los emojis queden más chicos.
+  // 🎯 PUNTAJE → EDAD (ver 🔧 EDADES)
+  EXCELENTE: 12,           // encontrados de un "ojo de águila" en el tiempo de arriba
+  MALO: 1,                 // encontrados de alguien sin lentes
+};
+/* PARES_VISTA: cada par es [emoji normal, emoji diferente]. El juego
+   elige un par al azar y a veces los da vuelta (el "diferente" puede
+   ser cualquiera de los dos).
+   CÓMO AGREGAR PARES:
+     1. Copia una línea, por ejemplo  ['🐶', '🐱'],
+     2. Pon dos emojis PARECIDOS pero que se puedan distinguir bien en
+        un celular (mismo color y tamaño, algún detalle distinto).
+     3. Prueba con  index.html?prueba=vista  que se vean bien.
+   OJO: no uses pares que sólo cambian de color (rojo/verde): a las
+   personas daltónicas les resulta imposible. */
+const PARES_VISTA = [
+  ['😀', '😃'],   // cambian los ojos
+  ['🙂', '🙃'],   // una está al revés
+  ['😐', '😑'],   // ojos abiertos / cerrados
+  ['😺', '😸'],   // gato feliz / gato riendo
+  ['🐶', '🐱'],
+  ['🐭', '🐹'],
+  ['🐻', '🐼'],
+  ['🍎', '🍅'],
+  ['🍪', '🍩'],
+  ['⚽', '🏐'],
+  ['🌲', '🌳'],
+  ['🚗', '🚕'],
+  ['⭐', '🌟'],
+  ['🌕', '🌝'],
+  // 💡 IDEA: dificultad creciente: ordenar esta lista de fácil a difícil y, en nuevaRondaVista(),
+  //          elegir pares cada vez más difíciles según cuántos llevas encontrados.
+];
+
+
+/* =====================================================================
+   🔧 LÓGICA 🧮 — preguntas de alternativas (4 opciones) contra el reloj.
+   Puntaje: las correctas, MENOS 1 por cada ERRORES_POR_PUNTO incorrectas
+   (nunca menos de 0). Ejemplo: 8 correctas y 5 incorrectas → 8 − 2 = 6.
+   ¿Por qué restan los errores? Con 4 opciones, quien toca al azar lo más
+   rápido posible acierta 1 de cada 4 sin leer: sin este descuento sacaba
+   más puntos que alguien que sí piensa. Con él, adivinar no sirve.
+   ===================================================================== */
+CONFIG.LOGICA = {
+  TIEMPO: 40,              // ⏱️ segundos que dura la prueba
+  PAUSA_ACIERTO: 350,      // ⏱️ ms que se ve la respuesta en verde antes de la siguiente pregunta
+  PAUSA_ERROR: 700,        // ⏱️ ms que se ve el error (y la respuesta correcta en verde) antes de seguir
+  ERRORES_POR_PUNTO: 2,    // cada cuántas respuestas incorrectas se resta 1 correcta (0 = los errores no restan)
+  // Preguntas automáticas (salen si se acaban las de la lista):
+  SUMA_MIN: 11,            // sumas y restas: los números que se suman (y en las restas, el que se resta
+  SUMA_MAX: 60,            //    y el resultado) van entre SUMA_MIN y SUMA_MAX. Ej.: 23 + 48, 71 − 48 = 23
+                           //    (para cuentas más fáciles baja LOS DOS, por ejemplo 2 y 10)
+  TABLA_MIN: 3,            // multiplicaciones: tablas desde esta…
+  TABLA_MAX: 12,           //    …hasta esta. Ej.: 7 × 8 (el MAX tiene que ser mayor o igual que el MIN)
+  // 🎯 PUNTAJE → EDAD (ver 🔧 EDADES)
+  EXCELENTE: 10,           // puntos de un genio en el tiempo de arriba
+  MALO: 0,                 // puntos de alguien que no acierta (o que sólo adivina)
+};
+/* PREGUNTAS_LOGICA: el juego las mezcla y las muestra en orden al azar.
+   Si se acaban, inventa cuentas solo (sumas, restas y multiplicaciones).
+   Las opciones también se mezclan en pantalla: no importa en qué lugar
+   pongas la correcta.
+   CÓMO AGREGAR PREGUNTAS:
+     1. Copia una línea completa { pregunta: …, opciones: […], correcta: N },
+     2. Escribe la pregunta y EXACTAMENTE 4 opciones distintas, entre comillas.
+     3. "correcta" es la POSICIÓN de la respuesta buena, contando DESDE 0:
+          opciones: ['A', 'B', 'C', 'D']
+                      0    1    2    3
+        ⚠️ OJO: revisa DOS VECES que el número de "correcta" apunte a la
+        respuesta buena. Es el error más común: si pones 1 pensando en la
+        primera opción, el juego dará por buena la segunda.
+     4. Asegúrate de que sólo UNA opción sea correcta sin discusión.
+   (Si una pregunta está mal escrita —no tiene 4 opciones, hay dos
+    iguales, o "correcta" no existe— el juego la salta y lo avisa en la
+    consola del navegador: tecla F12.) */
+const PREGUNTAS_LOGICA = [
+  // — Series de números —
+  { pregunta: '¿Qué número sigue? 2, 4, 8, 16, …', opciones: ['32', '24', '20', '30'], correcta: 0 },
+  { pregunta: '¿Qué número sigue? 1, 3, 5, 7, …', opciones: ['8', '9', '10', '11'], correcta: 1 },
+  { pregunta: '¿Qué número sigue? 5, 10, 15, 20, …', opciones: ['30', '22', '25', '35'], correcta: 2 },
+  { pregunta: '¿Qué número sigue? 1, 1, 2, 3, 5, 8, …', opciones: ['11', '12', '16', '13'], correcta: 3 },
+  { pregunta: '¿Qué número sigue? 81, 27, 9, 3, …', opciones: ['1', '0', '2', '6'], correcta: 0 },
+  { pregunta: '¿Qué número sigue? 1, 4, 9, 16, …', opciones: ['20', '25', '24', '36'], correcta: 1 },
+  { pregunta: '¿Qué número sigue? 100, 90, 80, 70, …', opciones: ['65', '50', '60', '75'], correcta: 2 },
+  { pregunta: '¿Qué número sigue? 3, 6, 12, 24, …', opciones: ['36', '30', '42', '48'], correcta: 3 },
+  { pregunta: '¿Qué número sigue? 2, 5, 8, 11, …', opciones: ['14', '13', '15', '12'], correcta: 0 },
+  { pregunta: '¿Qué letra sigue? A, C, E, G, …', opciones: ['H', 'I', 'J', 'K'], correcta: 1 },
+  { pregunta: '¿Qué número sigue? 1, 2, 4, 7, 11, …', opciones: ['15', '18', '16', '14'], correcta: 2 },
+  { pregunta: '¿Qué número sigue? 64, 32, 16, 8, …', opciones: ['6', '2', '0', '4'], correcta: 3 },
+  { pregunta: '¿Qué número sigue? 7, 14, 21, 28, …', opciones: ['35', '32', '36', '42'], correcta: 0 },
+  // — Cuentas rápidas —
+  { pregunta: '¿Cuánto es 7 × 8?', opciones: ['54', '56', '48', '64'], correcta: 1 },
+  { pregunta: '¿Cuánto es 15 + 27?', opciones: ['32', '41', '42', '43'], correcta: 2 },
+  { pregunta: '¿Cuánto es 100 − 37?', opciones: ['73', '67', '53', '63'], correcta: 3 },
+  { pregunta: '¿Cuánto es la mitad de 90?', opciones: ['45', '40', '35', '50'], correcta: 0 },
+  { pregunta: '¿Cuánto es 9 × 9?', opciones: ['72', '81', '99', '89'], correcta: 1 },
+  { pregunta: '¿Cuánto es 144 ÷ 12?', opciones: ['11', '14', '12', '16'], correcta: 2 },
+  { pregunta: '¿Cuánto es el 25 % de 80?', opciones: ['25', '16', '40', '20'], correcta: 3 },
+  { pregunta: '¿Cuántos minutos hay en 2 horas?', opciones: ['100', '120', '200', '60'], correcta: 1 },
+  { pregunta: '¿Qué número falta? 3 + ? = 11', opciones: ['7', '9', '8', '6'], correcta: 2 },
+  // — ¿Cuál no corresponde? —
+  { pregunta: '¿Cuál NO es una fruta?', opciones: ['🥕 Zanahoria', '🍎 Manzana', '🍌 Plátano', '🍇 Uva'], correcta: 0 },
+  { pregunta: '¿Cuál NO es un mamífero?', opciones: ['🐬 Delfín', '🦈 Tiburón', '🐋 Ballena', '🦇 Murciélago'], correcta: 1 },
+  { pregunta: '¿Cuál NO es un número primo?', opciones: ['2', '7', '9', '13'], correcta: 2 },
+  { pregunta: '¿Cuál número NO es par?', opciones: ['8', '14', '22', '15'], correcta: 3 },
+  { pregunta: '¿Cuál NO es un planeta?', opciones: ['La Luna', 'Marte', 'Venus', 'Saturno'], correcta: 0 },
+  { pregunta: '¿Cuál NO es un instrumento musical?', opciones: ['🎸 Guitarra', '🍴 Tenedor', '🎹 Piano', '🎻 Violín'], correcta: 1 },
+  { pregunta: '¿Cuál de estos animales NO tiene 4 patas?', opciones: ['🐶 Perro', '🐱 Gato', '🐔 Gallina', '🐴 Caballo'], correcta: 2 },
+  // — Acertijos —
+  { pregunta: 'Si hoy es lunes, ¿qué día será pasado mañana?', opciones: ['Martes', 'Jueves', 'Domingo', 'Miércoles'], correcta: 3 },
+  { pregunta: 'Si ayer fue viernes, ¿qué día será mañana?', opciones: ['Domingo', 'Sábado', 'Lunes', 'Jueves'], correcta: 0 },
+  { pregunta: 'Pedro es más alto que Ana, y Ana es más alta que Luis. ¿Quién es el más bajo?', opciones: ['Pedro', 'Luis', 'Ana', 'No se sabe'], correcta: 1 },
+  { pregunta: 'Un papá tiene 3 hijas y cada hija tiene un solo hermano. ¿Cuántos hijos tiene en total?', opciones: ['3', '6', '4', '7'], correcta: 2 },
+  { pregunta: 'Si 3 gatos cazan 3 ratones en 3 minutos, ¿cuántos minutos tarda 1 gato en cazar 1 ratón?', opciones: ['1', '9', '6', '3'], correcta: 3 },
+  { pregunta: 'Un tren sale a las 14:00 y el viaje dura 2 horas y media. ¿A qué hora llega?', opciones: ['16:30', '16:00', '17:30', '15:30'], correcta: 0 },
+  { pregunta: 'Tengo 12 caramelos y regalo la mitad. ¿Cuántos me quedan?', opciones: ['4', '6', '8', '3'], correcta: 1 },
+  { pregunta: '¿Qué pesa más: 1 kilo de plumas o 1 kilo de piedras?', opciones: ['Las piedras', 'Las plumas', 'Pesan lo mismo', 'Depende del día'], correcta: 2 },
+  { pregunta: '¿Cuántos lados tiene un hexágono?', opciones: ['5', '8', '7', '6'], correcta: 3 },
+  { pregunta: 'Mi hermano tiene 7 años y yo tengo el doble. ¿Cuántos años tengo?', opciones: ['14', '9', '12', '21'], correcta: 0 },
+  // EJEMPLO para copiar (sin las // del principio):
+  // { pregunta: '¿Cuánto es 6 × 7?', opciones: ['42', '36', '48', '49'], correcta: 0 },
+];
+
+
+/* =====================================================================
+   🔧 CONCENTRACIÓN 🎨 — prueba de Stroop: aparece el nombre de un
+   color (por ejemplo "ROJO") pintado con OTRO color de tinta. Hay que
+   tocar el botón del color de la TINTA, no lo que dice la palabra.
+   Puntaje: correctas menos errores (nunca menos de 0).
+   ===================================================================== */
+CONFIG.CONCENTRACION = {
+  TIEMPO: 25,              // ⏱️ segundos que dura la prueba
+  CONGRUENTES: 0.25,       // parte de las palabras que SÍ van pintadas de su propio color (0.25 = 1 de cada 4; son las "fáciles")
+  PAUSA_ACIERTO: 150,      // ⏱️ ms entre una respuesta correcta y la siguiente palabra
+  PAUSA_ERROR: 300,        // ⏱️ ms que se ve el error antes de la siguiente palabra
+  // 🎯 PUNTAJE → EDAD (ver 🔧 EDADES)
+  EXCELENTE: 14,           // puntos (correctas − errores) de alguien muy concentrado
+  MALO: 0,                 // puntos de alguien que se deja engañar todo el rato
+};
+/* COLORES_STROOP: los colores de la prueba. Los botones salen en este
+   mismo orden (y las teclas 1, 2, 3, 4 también).
+     nombre → lo que se escribe (la palabra sale en MAYÚSCULAS)
+     color  → la tinta: debe verse bien sobre el fondo oscuro
+   Usa 4 o 5 colores con nombres bien distintos. Para un 5.º color,
+   quita las // de la línea de "Blanco": los botones se acomodan solos
+   (con el celular acostado quedan los 5 en una fila) y los textos de
+   las teclas pasan solos a decir "1 a 5".
+   💡 IDEA: versión para daltónicos: rojo y verde se confunden para
+            muchas personas. Se puede cambiar Verde por { nombre: 'Blanco',
+            color: '#ffffff' } o Rojo por { nombre: 'Rosado', color: '#ff7ad9' },
+            o agregar en CONFIG.CONCENTRACION un MODO_DALTONICO: true que use
+            formas (● ■ ▲ ★) en vez de colores en empezarConcentracion(). */
+const COLORES_STROOP = [
+  { nombre: 'Rojo', color: '#ff4d5e' },
+  { nombre: 'Azul', color: '#4da3ff' },
+  { nombre: 'Verde', color: '#3ddc84' },
+  { nombre: 'Amarillo', color: '#ffd23f' },
+  // { nombre: 'Blanco', color: '#ffffff' },
+];
+
+
+/* =====================================================================
+   🔧 PRUEBAS — la lista de pruebas. El juego las hace EN ESTE ORDEN.
+   ---------------------------------------------------------------------
+   Cada prueba tiene (las marcadas con * son OBLIGATORIAS):
+     id *          → nombre interno, en minúsculas, sin tildes ni espacios
+                     (se usa en ?prueba=…). Ej.: 'dedos' o 'vista_rapida'
+     nombre *      → el nombre que se ve
+     emoji *       → su dibujito
+     mide          → qué mide, en pocas palabras (sale en sus instrucciones)
+     instrucciones → qué hay que hacer (1 o 2 líneas; se puede usar <b>negrita</b>)
+     teclado       → (opcional) ayuda de teclas para computador
+     activa        → true = sale en el juego; false = no sale
+     peso          → cuánto cuenta en la edad final. 1 = normal, 2 = el doble,
+                     0.5 = la mitad. (Si desactivas una prueba, las demás se
+                     reparten su peso solas.)
+     config *      → sus ajustes: EXCELENTE y MALO (obligatorios) y los suyos propios
+     unidad *      → cómo se escribe su puntaje ("245 ms promedio"). Si falta,
+                     se muestra el número solo.
+     empezar *     → la función que la hace funcionar (no tocar)
+
+   PARA CAMBIAR EL ORDEN: mueve el bloque { … } completo de una prueba.
+   PARA QUITAR UNA PRUEBA: pon  activa: false
+   (El subtítulo "5 pruebas rápidas…", la lista de inicio, la barra de
+    progreso y la imagen del resultado se acomodan solos a la cantidad de
+    pruebas. Lo único que hay que cambiar a mano es la descripción del
+    link, arriba de todo en la línea <meta name="description" …>.)
+
+   CÓMO AGREGAR UNA PRUEBA NUEVA (paso a paso):
+     1. Al final de esta lista hay una prueba de EJEMPLO ("Dedos
+        rápidos") entre una línea  ▼▼▼ DESDE AQUÍ  y otra  ▲▲▲ HASTA AQUÍ.
+     2. Quítale las // del principio a las líneas que están ENTRE esas
+        dos flechas (selecciónalas y usa Ctrl+/ en tu editor, o bórralas
+        con cuidado). Las dos líneas de las flechas tienen // doble: si
+        también les quitas unas //, siguen siendo notas y no pasa nada.
+        Guarda y abre la página: ¡ya sale como sexta prueba!
+     3. Cámbiale id, nombre, emoji, mide e instrucciones.
+     4. En "config" pon EXCELENTE (el puntaje de un crack) y MALO (el de
+        alguien muy malo). Si en tu prueba MENOS es mejor (como en
+        Reflejos), pon EXCELENTE más chico que MALO.
+     5. "empezar(juego)" es lo que pasa durante la prueba. Puedes usar:
+          juego.area                  → la caja donde se dibuja la prueba
+          juego.boton(texto, alTocar) → crea un botón grande
+          juego.cronometro(segundos, alTerminar) → reloj con barra (se
+                                        pausa solo si cambias de pestaña)
+          juego.despues(funcion, ms)  → hacer algo en un rato
+          juego.estado(texto)         → texto arriba a la derecha ("3 toques")
+          juego.sonar('BIEN' | 'MAL' | 'YA' | 'CUENTA')
+          juego.anunciar(texto)       → lo lee en voz alta a quien usa lector de pantalla
+          juego.terminar(puntaje, detalle) → termina la prueba con ese puntaje
+     6. Pruébala sola con  index.html?prueba=TU_ID
+     7. La imagen del resultado (🔧 CARTA) achica sola las letras de las
+        barras para que quepan 6 o más pruebas: no hay que tocar nada.
+        Recuerda cambiar la descripción del link (ver más arriba).
+   ===================================================================== */
+const PRUEBAS = [
+  {
+    id: 'reflejos',
+    nombre: 'Reflejos',
+    emoji: '⚡',
+    mide: 'qué tan rápido reaccionas',
+    instrucciones: 'Cuando la zona se ponga <b>verde</b>, tócala lo más rápido que puedas. Si tocas en rojo, se repite.',
+    teclado: '⌨️ También puedes usar Espacio o Enter',
+    activa: true,
+    peso: 1,
+    config: CONFIG.REFLEJOS,
+    unidad: (v) => `${v} ms promedio`,
+    sonidoAlEmpezar: false,          // aquí el "¡YA!" suena cuando la zona se pone verde
+    empezar: empezarReflejos,
+  },
+  {
+    id: 'memoria',
+    nombre: 'Memoria',
+    emoji: '🧩',
+    mide: 'cuántas cosas recuerdas en orden',
+    instrucciones: 'Mira qué casillas se iluminan y <b>tócalas en el mismo orden</b>. Cada vez será una más.',
+    activa: true,
+    peso: 1,
+    config: CONFIG.MEMORIA,
+    unidad: (v) => `secuencia de ${v}`,
+    empezar: empezarMemoria,
+  },
+  {
+    id: 'vista',
+    nombre: 'Vista',
+    emoji: '👀',
+    mide: 'qué tan rápido encuentras detalles',
+    instrucciones: 'Todos los emojis son iguales menos <b>uno</b>. ¡Encuéntralo! Si te equivocas, pierdes tiempo.',
+    activa: true,
+    peso: 1,
+    config: CONFIG.VISTA,
+    unidad: (v) => (v === 1 ? '1 encontrado' : `${v} encontrados`),   // (con 1 va en singular)
+    empezar: empezarVista,
+  },
+  {
+    id: 'logica',
+    nombre: 'Lógica',
+    emoji: '🧮',
+    mide: 'qué tan rápido piensas',
+    instrucciones: 'Series, cuentas y acertijos: responde <b>todas las que puedas</b> antes de que se acabe el tiempo. Adivinar no sirve: los errores restan.',
+    teclado: '⌨️ También puedes usar las teclas 1, 2, 3 y 4',
+    activa: true,
+    peso: 1,
+    config: CONFIG.LOGICA,
+    unidad: (v) => (v === 1 ? '1 punto' : `${v} puntos`),   // puntos = correctas menos el descuento por errores
+    empezar: empezarLogica,
+  },
+  {
+    id: 'concentracion',
+    nombre: 'Concentración',
+    emoji: '🎨',
+    mide: 'tu atención (¡que no te engañe la palabra!)',
+    instrucciones: 'Toca el <b>color de la tinta</b>, no lo que dice la palabra. Si ves ROJO pintado de azul, toca Azul.',
+    teclado: `⌨️ También puedes usar las teclas 1 a ${COLORES_STROOP.length}`,   // (dice "1 a 4" o "1 a 5" según los colores)
+    activa: true,
+    peso: 1,
+    config: CONFIG.CONCENTRACION,
+    unidad: (v) => (v === 1 ? '1 punto' : `${v} puntos`),
+    empezar: empezarConcentracion,
+  },
+  // // ▼▼▼ DESDE AQUÍ: prueba de EJEMPLO. Quítale las // a las líneas de abajo (no a esta) ▼▼▼
+  // {
+  //   id: 'dedos',
+  //   nombre: 'Dedos rápidos',
+  //   emoji: '👆',
+  //   mide: 'qué tan rápido mueves el dedo',
+  //   instrucciones: 'Toca el botón <b>todas las veces que puedas</b> antes de que se acabe el tiempo.',
+  //   activa: true,
+  //   peso: 1,
+  //   config: { TIEMPO: 5, EXCELENTE: 40, MALO: 10 },   // segundos que dura · toques de un crack · toques de alguien lento
+  //   unidad: (v) => (v === 1 ? '1 toque' : `${v} toques`),
+  //   empezar(juego) {
+  //     let toques = 0;
+  //     juego.cronometro(juego.config.TIEMPO, () => juego.terminar(toques));
+  //     juego.boton('👆 ¡Toca!', () => { toques++; juego.estado(`👆 ${toques}`); });
+  //     return { pista: () => ({ toques }) };
+  //   },
+  // },
+  // // ▲▲▲ HASTA AQUÍ ▲▲▲
+];
+
+// 💡 IDEA: prueba de OÍDO 👂: suenan dos tonos y hay que decir cuál fue más agudo; con tono()
+//          de 🔧 SONIDOS y dos botones (juego.boton). Se va achicando la diferencia entre tonos.
+//          Se agregaría como un bloque { … } más en la lista PRUEBAS de arriba.
+// 💡 IDEA: prueba de CONTAR 🔢: aparecen puntos un segundo y hay que decir cuántos eran
+//          (4 botones como en Lógica). Mide la "vista rápida" (subitización).
+
+
+/* =====================================================================
+   🔧 EDADES — cómo se convierte cada puntaje en años
+   ---------------------------------------------------------------------
+   En palabras simples:
+     1. Cada prueba tiene dos puntajes de referencia en su sección:
+        EXCELENTE (lo que haría un crack) y MALO (lo que haría alguien
+        muy malo). Busca EXCELENTE con Ctrl+F para verlos todos.
+     2. Se mira dónde quedó tu puntaje entre esos dos, de 0 a 1:
+          nota = (tu puntaje − MALO) ÷ (EXCELENTE − MALO)
+        (si te pasas de EXCELENTE vale 1; si estás bajo MALO vale 0)
+     3. La nota se "curva" con CURVA (elevar a una potencia): con menos
+        de 1, a la gente promedio le toca una edad un poco más joven.
+        (No conviene bajarla mucho de 0.7: con 0.5 o menos, sacar 1 punto
+        más que MALO ya baja la edad unos 20 años de golpe.)
+     4. edad = EDAD_PEOR − nota curvada × (EDAD_PEOR − EDAD_MEJOR)
+        y se le suma un poquito de azar (± AZAR años) para que dos
+        partidas iguales no den exactamente lo mismo.
+     5. La edad FINAL es el promedio de las edades de cada prueba,
+        usando el "peso" de cada una (ver 🔧 PRUEBAS).
+     6. "Tu súper poder" y "A entrenar" se eligen por la nota (sin el
+        azar): la prueba con la nota más alta y la más baja.
+
+   EJEMPLO con números (Reflejos: EXCELENTE 220 ms, MALO 550 ms, CURVA 0.7):
+     Si tu promedio fue 330 ms:
+       nota = (330 − 550) ÷ (220 − 550) = −220 ÷ −330 = 0,67
+       nota curvada = 0,67 elevado a 0,7 = 0,75
+       edad = 95 − 0,75 × (95 − 18) = 95 − 58 = 37 años (± 2 de azar)
+     Si fue 220 ms o menos → nota 1 → 18 años. Si fue 550 o más → 95 años.
+     Y en una prueba donde MÁS es mejor (Memoria: EXCELENTE 8, MALO 2),
+     una secuencia de 6 da: nota = (6 − 2) ÷ (8 − 2) = 0,67 → también 37 años.
+
+   TABLA sin azar (con los valores de este archivo):
+     Reflejos (ms):    250→23  300→32  330→37  400→51  450→62  500→74
+     Memoria (largo):  3→73    4→59    5→48    6→37    7→27    8→18
+     Vista:            2→81    4→64    6→51    8→39    10→28   12→18
+     Lógica (puntos):  1→80    2→70    4→54    6→41    8→29    10→18
+     Concentración:    1→83    2→75    4→63    6→52    10→34   14→18
+
+   CALIBRACIÓN (probada con jugadores-robot automáticos, partidas completas
+   a velocidad normal, con los valores de este archivo):
+     • Robot PERFECTO (todo bien y rápido)              → 18 a 19 años (6 partidas)
+     • Robot PROMEDIO (≈65 % bien, reflejos ≈330 ms)    → 34 a 54 años (11 partidas, en
+                                                          promedio 44; 2 de 11 pasaron de 50)
+     • Robot MALO que no toca nada                      → 94 a 95 años
+     • Robot MALO que toca al azar                      → 84 a 95 años (en promedio 92)
+     • Tocar al azar LO MÁS RÁPIDO POSIBLE en Lógica    → 0 puntos en 4 de 5 intentos (95 años);
+                                                          con mucha suerte, 3 puntos (61 años)
+   (El robot PROMEDIO varía bastante porque en Concentración un 65 % de
+    aciertos da desde 0 hasta 15 puntos según la suerte.)
+   Si la gente dice que le sale "muy viejo": baja CURVA (por ejemplo a 0.6)
+   o baja los EXCELENTE. Si le sale "muy joven": sube CURVA (por ejemplo a
+   0.8) o sube los EXCELENTE. Cambia de a poco y prueba varias veces.
+   ===================================================================== */
+const EDADES = {
+  EDAD_MEJOR: 18,          // años que da una prueba hecha a nivel EXCELENTE. Si la bajas de 18, baja también
+                           //    EDAD_MINIMA_MOSTRADA (si no, se sigue mostrando 18 como mínimo)
+  EDAD_PEOR: 95,           // años que da una prueba hecha a nivel MALO (o peor). Si la subes de 99, sube
+                           //    también EDAD_MAXIMA_MOSTRADA (si no, se sigue mostrando 99 como máximo)
+  CURVA: 0.7,              // 1 = parejo; menos de 1 = más generoso con los del medio; más de 1 = más exigente
+  AZAR: 2,                 // años de azar que se suman o restan a cada prueba (0 = sin azar)
+  EDAD_MINIMA_MOSTRADA: 18,// nunca se muestra una edad menor que esta (ni en cada prueba ni en el final)
+  EDAD_MAXIMA_MOSTRADA: 99,// ni mayor que esta
+};
+
+
+/* =====================================================================
+   🔧 RESULTADOS — la frase del final según tu edad.
+   Se elige la PRIMERA fila cuyo "hasta" sea mayor o igual a tu edad.
+   La frase se arma con TEXTOS.FRASE_RESULTADO, por ejemplo:
+     'Tienes la mente de {quien} de {edad} años {emoji}'
+       → "Tienes la mente de un abuelo sabio de 82 años 👴"
+   (Si "quien" empieza con "el", el juego escribe "del" solo:
+    "de el tío" → "del tío".)
+   ===================================================================== */
+const RESULTADOS = [
+  { hasta: 22, quien: 'un gamer en racha', emoji: '🎮', descripcion: 'Reflejos de campeón y cero lag. ¿Seguro que no eres un robot?' },
+  { hasta: 30, quien: 'un cerebro en su mejor momento', emoji: '🧠', descripcion: 'Rápido, atento y con la memoria fresquita. ¡Estás en tu prime!' },
+  { hasta: 40, quien: 'un adulto con café', emoji: '☕', descripcion: 'Funcionas perfecto… después del primer café de la mañana.' },
+  { hasta: 55, quien: 'el tío del asado', emoji: '🍖', descripcion: 'Sabio, tranquilo y con buenos chistes. Sin apuro, pero sin pausa.' },
+  { hasta: 70, quien: 'un profe jubilado', emoji: '📚', descripcion: 'Mucha experiencia… pero los reflejos se quedaron en la sala de profes.' },
+  { hasta: 85, quien: 'un abuelo sabio', emoji: '👴', descripcion: 'Lento pero seguro. ¿Dónde dejaste los lentes?' },
+  { hasta: 999, quien: 'una tortuga milenaria', emoji: '🐢', descripcion: 'Sin prisa por la vida… ¿seguro que estabas jugando?' },
+];
+// Comentario corto que sale en el resultado de CADA prueba, según su edad
+const COMENTARIOS_PRUEBA = [
+  { hasta: 25, texto: '¡Increíble! 🔥' },
+  { hasta: 35, texto: '¡Muy bien! 💪' },
+  { hasta: 50, texto: 'Nada mal 👍' },
+  { hasta: 70, texto: 'Mmm… ¿con sueño? 😴' },
+  { hasta: 999, texto: '¡Uf! A entrenar 🐢' },
+];
+// Color de las barras del resultado: verde hasta BUENA_HASTA años, amarillo hasta MEDIA_HASTA, y rojo después
+const BARRAS = { BUENA_HASTA: 35, MEDIA_HASTA: 60 };
+
+
+/* =====================================================================
+   🔧 TEXTOS — todo lo que se lee en pantalla está aquí.
+   (Los nombres e instrucciones de cada prueba están en 🔧 PRUEBAS, y
+    las frases del final en 🔧 RESULTADOS.)
+   Los que tienen (n) => `...${n}...` son textos con un número adentro:
+   cambia las palabras, pero deja igual lo que está entre ${ }.
+   ===================================================================== */
+const TEXTOS = {
+  TITULO: '🧠 Tu edad mental',
+  SUBTITULO: (n) => (n === 1 ? 'Una prueba rápida para descubrir la edad de tu cerebro'
+    : `${n} pruebas rápidas para descubrir la edad de tu cerebro`),   // n = cuántas pruebas activas hay
+  INICIO_TITULO: '¿Qué edad tiene tu cerebro?',
+  BOTON_EMPEZAR: '▶ Empezar',
+  RECORD: (edad, fecha) => `🏆 Tu mejor edad: ${edad} años${fecha ? ` (${fecha})` : ''}`,
+  SIN_RECORD: '🏆 Récord: ¡todavía ninguno!',
+  SONIDO_SI: '🔊 Sonido: sí',
+  SONIDO_NO: '🔇 Sonido: no',
+  SONIDO_ICONO_SI: '🔊',
+  SONIDO_ICONO_NO: '🔇',
+  SONIDO_ARIA_SI: 'Sonido encendido. Toca para silenciar.',
+  SONIDO_ARIA_NO: 'Sonido apagado. Toca para activarlo.',
+  SONIDO_AYUDA: 'Sonido (tecla M)',            // lo que sale al dejar el mouse encima del botón 🔊
+  CASA_ICONO: '🏠',
+  CASA_AYUDA: 'Volver al inicio',
+  CONFIRMAR_SALIR: '¿Salir? Toca 🏠 otra vez y se pierde esta partida',   // al tocar 🏠 a mitad de una partida
+  ATAJOS: (n) => `⌨️ Teclas: Espacio = reflejos · 1 a ${n} = responder · M = sonido`,   // sólo se ve en computadores
+  PROGRESO_ARIA: (n, total) => `Progreso: prueba ${n} de ${total}`,
+  PASO_ARIA: (nombre, como) => `${nombre}: ${como}`,
+  PASO_HECHO: 'lista', PASO_ACTUAL: 'ahora', PASO_PENDIENTE: 'pendiente',
+  PASO: (n, total) => `Prueba ${n} de ${total}`,
+  MIDE: (texto) => `Mide ${texto}`,
+  BOTON_LISTO: '¡Listo!',
+  CUENTA_TEXTO: 'Prepárate…',
+  ANUNCIO_EMPIEZA: (nombre) => `¡Empieza ${nombre}!`,
+  SELLO_TIEMPO: '⏱ ¡Tiempo!',
+  SELLO_LISTO: '✅ ¡Listo!',
+  SELLO_FIN: '🏁 ¡Fin!',                         // por ejemplo en Memoria, al quedarte sin vidas
+  ANUNCIO_BIEN: 'Correcto',                      // (sólo para lectores de pantalla)
+  ANUNCIO_MAL: 'Incorrecto',
+  RESULTADO_LINEA: (valor, edad) => `${valor} → ${edad} años`,
+  EDAD_CHIP: (edad) => `${edad} años`,
+  BOTON_SIGUIENTE_PRUEBA: 'Siguiente prueba ▶',
+  BOTON_VER_EDAD: '🧠 Ver mi edad mental',
+  BOTON_REPETIR_PRUEBA: '🔁 Repetir prueba',    // sólo sale con ?prueba= en la dirección
+  TIEMPO: (s) => `⏱ ${s} s`,
+  PAUSA_TITULO: '⏸ Pausa',
+  PAUSA_TEXTO: 'Toca para seguir',
+  BOTON_SEGUIR: '▶ Seguir',
+  AVISO_RAPIDO: (f) => `⚡ Modo rápido (sólo para probar): tiempos ÷ ${f} y no se guarda el récord`,
+  AVISO_SIN_PRUEBAS: 'No hay pruebas activas (revisa 🔧 PRUEBAS)',
+  AVISO_PROBLEMA: 'Esta prueba tuvo un problema 😅',
+
+  // ⚡ Reflejos
+  REFLEJOS_ESPERA: 'Espera…',
+  REFLEJOS_ESPERA_SUB: 'Toca cuando se ponga verde',
+  REFLEJOS_YA: '¡YA!',
+  REFLEJOS_YA_SUB: '¡Toca ahora!',
+  REFLEJOS_PRONTO: '¡Muy pronto!',
+  REFLEJOS_PRONTO_SUB: 'Espera el verde. Se repite la ronda.',
+  REFLEJOS_ADIVINO_SUB: 'Eso fue adivinar 😉 Se repite la ronda.',
+  REFLEJOS_CASTIGO: '🚫 Demasiado apurado',
+  REFLEJOS_CASTIGO_SUB: (ms) => `Esta ronda vale ${ms} ms`,
+  REFLEJOS_LENTO: '¡Muy lento! 🐢',
+  REFLEJOS_LENTO_SUB: (ms) => `Esta ronda vale ${ms} ms`,
+  REFLEJOS_MS: (ms) => `${ms} ms`,
+  REFLEJOS_CASTIGADA_ICONO: '🚫',               // va antes del tiempo de una ronda castigada o lenta ("🚫1000 ms")
+  REFLEJOS_BUENO_SUB: '¡Bien!',
+  REFLEJOS_PAUSA_SUB: 'La ronda se repite',      // sale en la tarjeta de pausa durante Reflejos
+  REFLEJOS_RONDA: (n, total) => `Ronda ${n} de ${total}`,
+  REFLEJOS_FICHA: (n, texto) => `${n}.ª ${texto}`,
+  REFLEJOS_DETALLE: (lista, prontos) => `Rondas: ${lista.join(' · ')}` + (prontos ? ` · ${prontos} × muy pronto` : ''),
+  // 🧩 Memoria
+  MEMORIA_MIRA: '👀 Mira con atención…',
+  MEMORIA_TURNO: (hecho, total) => `👆 ¡Tu turno! ${hecho} de ${total}`,
+  MEMORIA_BIEN: '✅ ¡Bien! Una más…',
+  MEMORIA_MAXIMO: '🏆 ¡Memoria perfecta!',
+  MEMORIA_MAL: '❌ ¡Ups! Otra secuencia',
+  MEMORIA_TIEMPO: '⌛ Muy lento: otra secuencia',
+  MEMORIA_SIN_VIDAS: '💔 Sin vidas',
+  MEMORIA_ESTADO: (largo, vidas, total) => `Largo ${largo} · ${'❤️'.repeat(vidas)}${'🖤'.repeat(Math.max(0, total - vidas))}`,
+  MEMORIA_DETALLE: (errores) => `Errores: ${errores}`,
+  // 👀 Vista
+  VISTA_AYUDA: 'Toca el emoji diferente',
+  VISTA_ESTADO: (n) => `🔎 ${n}`,
+  VISTA_CASTIGO: (s) => `−${s} s`,
+  VISTA_DETALLE: (errores) => `Errores: ${errores}`,
+  VISTA_ANUNCIO_BIEN: (n) => `¡Encontrado! Llevas ${n}`,   // (sólo para lectores de pantalla)
+  VISTA_ANUNCIO_MAL: (s) => `Ese no. Menos ${s} segundos`,
+  // 🧮 Lógica
+  LOGICA_ESTADO: (n) => `⭐ ${n}`,                // puntos que llevas
+  LOGICA_DETALLE: (bien, mal, resta) => `Correctas: ${bien} · Incorrectas: ${mal}` + (resta ? ` (restan ${resta})` : ''),
+  ARITMETICA: (a, signo, b) => `¿Cuánto es ${a} ${signo} ${b}?`,
+  // 🎨 Concentración
+  STROOP_AYUDA: 'Toca el COLOR de la tinta (no lo que dice)',
+  STROOP_ESTADO: (n) => `⭐ ${n}`,
+  STROOP_DETALLE: (bien, mal) => `Correctas: ${bien} − errores: ${mal}`,
+
+  // Resultado final
+  FINAL_ETIQUETA: 'Tu edad mental es',
+  ANOS: 'años',
+  FRASE_RESULTADO: 'Tienes la mente de {quien} de {edad} años {emoji}',
+  DESGLOSE_TITULO: 'Prueba por prueba',
+  NUEVO_RECORD: '🏆 ¡Nuevo récord!',
+  PRIMER_RECORD: '🏆 ¡Tu primer récord!',
+  ROBOT: '¿Eres un robot? 🤖',
+  SUPER_PODER: (nombre, emoji) => `💪 Tu súper poder: ${nombre} ${emoji}`,
+  A_ENTRENAR: (nombre, emoji) => `🏋️ A entrenar: ${nombre} ${emoji}`,
+  SUPER_PODER_TODAS: '💪 Tu súper poder: ¡todas las pruebas! 🏆',   // si todas quedaron al máximo
+  A_ENTRENAR_TODAS: '🏋️ A entrenar: ¡todas las pruebas!',          // si todas quedaron en lo más bajo
+  FILA_ARIA: (nombre, valor, edad) => `${nombre}: ${valor}, ${edad} años`,
+  ANUNCIO_FINAL: (edad, frase) => `Tu edad mental es ${edad} años. ${frase}`,
+  BOTON_COMPARTIR: '📤 Compartir',
+  BOTON_DESCARGAR: '⬇️ Descargar resultado',
+  BOTON_DESCARGAR_CORTO: '⬇️ Descargar',          // el mismo botón en celulares (angosto), para que quepa
+  BOTON_OTRA: '🔁 Jugar de nuevo',
+  BOTON_INICIO: '🏠 Inicio',
+  COMPARTIR_TITULO: 'Tu edad mental',
+  COMPARTIR_TEXTO: 'Mi edad mental es de {edad} años: ¡tengo la mente de {quien} {emoji}! ¿Y tú? 🧠',
+  ARCHIVO: (edad) => `mi-edad-mental-${edad}.png`,   // nombre del archivo que se descarga
+  AVISO_COPIADO: '¡Texto copiado! Pégalo donde quieras 📋',
+  AVISO_ERROR_COMPARTIR: 'No se pudo compartir. Prueba con "Descargar resultado" 😅',
+  AVISO_DESCARGADO: '¡Imagen descargada! 🖼️',
+  AVISO_ERROR_DESCARGAR: 'No se pudo crear la imagen 😅',
+  // Textos de la imagen que se descarga (🔧 CARTA)
+  CARTA_ETIQUETA: 'MI CEREBRO TIENE',
+  CARTA_ANOS: 'AÑOS',
+  CARTA_FECHA: (fecha) => `Jugado el ${fecha}`,
+};
+
+
+/* =====================================================================
+   🔧 SONIDOS — se crean con el navegador, sin archivos de audio.
+   Cada sonido es una lista de "tonos":
+     frecuencia      → qué tan agudo (Hz): 200 grave, 440 nota La, 1000 agudo
+     frecuenciaFinal → (opcional) a qué frecuencia se desliza mientras suena
+     duracion        → segundos que suena
+     tipo            → timbre: 'sine' (suave), 'triangle', 'square' (8 bits), 'sawtooth' (áspero)
+     volumen         → 0 a 1 (se multiplica por CONFIG.VOLUMEN)
+     retraso         → segundos que espera antes de sonar (para hacer melodías)
+   ===================================================================== */
+const SONIDOS = {
+  CUENTA: [{ frecuencia: 660, duracion: 0.12, tipo: 'square', volumen: 0.45 }],              // 3, 2, 1
+  YA: [{ frecuencia: 880, frecuenciaFinal: 1320, duracion: 0.16, tipo: 'square', volumen: 0.55 }],   // ¡YA! / empieza la prueba
+  BIEN: [                                                                                      // respuesta correcta
+    { frecuencia: 880, duracion: 0.08, tipo: 'triangle', volumen: 0.7 },
+    { frecuencia: 1320, duracion: 0.16, tipo: 'triangle', volumen: 0.7, retraso: 0.06 },
+  ],
+  MAL: [{ frecuencia: 190, frecuenciaFinal: 90, duracion: 0.28, tipo: 'sawtooth', volumen: 0.6 }],   // error
+  FIN_PRUEBA: [                                                                                // terminó una prueba
+    { frecuencia: 523, duracion: 0.12, tipo: 'triangle', volumen: 0.6 },
+    { frecuencia: 784, duracion: 0.22, tipo: 'triangle', volumen: 0.6, retraso: 0.1 },
+  ],
+  FANFARRIA: [                                                                                 // tu edad final
+    { frecuencia: 523, duracion: 0.14, tipo: 'triangle', volumen: 0.8, retraso: 0 },
+    { frecuencia: 659, duracion: 0.14, tipo: 'triangle', volumen: 0.8, retraso: 0.12 },
+    { frecuencia: 784, duracion: 0.14, tipo: 'triangle', volumen: 0.8, retraso: 0.24 },
+    { frecuencia: 1047, duracion: 0.55, tipo: 'triangle', volumen: 0.8, retraso: 0.36 },
+    { frecuencia: 784, duracion: 0.55, tipo: 'sine', volumen: 0.4, retraso: 0.36 },
+  ],
+  TIC: [{ frecuencia: 1800, duracion: 0.025, tipo: 'square', volumen: 0.12 }],               // el contador de edad subiendo
+  BOTON: [{ frecuencia: 660, duracion: 0.07, tipo: 'triangle', volumen: 0.4 }],              // al prender el sonido
+  // 🧩 Memoria: cada casilla tiene su nota (Hz), de la 1.ª a la 9.ª (de izquierda a derecha y de arriba abajo)
+  NOTAS_MEMORIA: [262, 294, 330, 349, 392, 440, 494, 523, 587],
+  NOTA_MEMORIA: { duracion: 0.22, tipo: 'triangle', volumen: 0.6 },
+  // 💡 IDEA: música de fondo suave durante las pruebas: un bucle de notas con setInterval que
+  //          llame a tono(), y que se detenga en limpiarPrueba().
+};
+
+
+/* =====================================================================
+   De aquí para abajo está la "maquinaria" del juego.
+   Normalmente no hace falta tocarla, pero también tiene notas.
+   ===================================================================== */
+
+// ---------- Estado del juego ----------
+// "estado" dice en qué momento estamos. Sólo puede ser uno de estos:
+//   'inicio'          → pantalla de inicio
+//   'intro'           → instrucciones de una prueba (botón "¡Listo!")
+//   'cuenta'          → cuenta regresiva 3-2-1
+//   'prueba'          → jugando una prueba
+//   'resultadoPrueba' → resultado de la prueba que acaba de terminar
+//   'final'           → resultado final con tu edad mental
+//   'pausa'           → cambiaste de pestaña en medio de una prueba
+let estado = 'inicio';
+let estadoAntesDePausa = null;
+let listaPruebas = [];             // las pruebas de esta partida (las activas, o sólo la de ?prueba=)
+let indicePrueba = 0;              // cuál de listaPruebas va ahora (0 = la primera)
+let pruebaActual = null;
+let control = null;                // lo que devuelve empezar() de la prueba (pista, pausar, reanudar, tecla)
+let cronActual = null;             // el cronómetro de la prueba (si tiene)
+let turnoPrueba = 0;               // sube cada vez que empieza o se abandona una prueba (así nada viejo se cuela)
+let crudos = {}, edades = {}, detalles = {};   // puntaje, edad y detalle de cada prueba ({ reflejos: 245, … })
+let notas = {};                    // la nota de 0 a 1 de cada prueba, SIN azar (para elegir súper poder / a entrenar)
+let edadFinal = null;
+let esRecordActual = false;
+let pruebaForzada = null;          // la prueba de ?prueba= en la dirección
+let rapido = false;                // true con ?rapido=1
+let FACTOR = 1;                    // por cuánto se dividen los tiempos (4 con ?rapido=1)
+let record = leerRecord();
+let silencio = leerSilencio();
+let audio = null;
+let momentoPantalla = -Infinity;   // cuándo apareció la pantalla actual (para CONFIG.BLOQUEO_TOQUE)
+let momentoCasa = -Infinity;       // cuándo se tocó 🏠 por primera vez (para pedir el segundo toque)
+
+// ---------- Elementos de la página ----------
+const $ = (id) => document.getElementById(id);
+const FUENTE_EMOJI = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+const PANTALLAS = ['pantallaInicio', 'pantallaIntro', 'pantallaCuenta', 'pantallaPrueba', 'pantallaResultado', 'pantallaFinal'];
+
+// ---------- Utilidades ----------
+const limitar = (v, min, max) => Math.max(min, Math.min(max, v));
+const azarEntero = (min, max) => min + Math.floor(Math.random() * (max - min + 1));   // número al azar entre min y max (ambos incluidos)
+const menosMovimiento = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const dur = (ms) => ms / FACTOR;   // con ?rapido=1 los tiempos se dividen por CONFIG.FACTOR_RAPIDO
+
+// Desordena una lista (la cambia y la devuelve)
+// 💡 IDEA: DESAFÍO DEL DÍA: usar aquí un azar con "semilla" (la fecha de hoy) en vez de Math.random,
+//          para que todos los que juegan el mismo día vean las mismas preguntas, secuencias y pares,
+//          y puedan compararse de igual a igual.
+function mezclar(lista) {
+  for (let i = lista.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [lista[i], lista[j]] = [lista[j], lista[i]];
   }
-}
-function person(g, x, y, hair, shirt, skin) {
-  g.fillStyle = shirt; rr(g, x - 46, y + 34, 92, 120, 28); g.fill();
-  g.fillStyle = hair; g.beginPath(); g.arc(x, y - 4, 34, 0, TAU); g.fill();
-  g.fillStyle = skin; g.beginPath(); g.arc(x + 2, y + 6, 27, 0, TAU); g.fill();
-}
-function buildBG() {
-  const SW = 1100, SH = 619;
-  const BH = H + 110;
-  const S = makeLayer(W, BH, 0.36), g = S.g;
-  const tx = PORTRAIT ? W / 2 - 640 : 0, ty = 110 + (H - 619), topY = -ty;
-  cordTop = topY;
-  g.translate(tx, ty);
-  let gr = g.createLinearGradient(0, topY, 0, 480);
-  gr.addColorStop(0, '#ecc79e'); gr.addColorStop(1, '#c58b5c');
-  g.fillStyle = gr; g.fillRect(0, topY, SW, 490 - topY);
-  g.fillStyle = '#8f9b6c'; g.fillRect(230, 100, 690, 300);
-  g.fillStyle = 'rgba(60,70,40,.22)';
-  for (let x = 250; x < 900; x += 70) g.fillRect(x, 100, 7, 300);
-  g.fillStyle = '#7e8a5c'; g.fillRect(230, 100, 690, 14);
-  g.fillStyle = '#e8c48f'; g.fillRect(300, 170, 80, 100);
-  g.fillStyle = '#b57f4a'; g.fillRect(310, 180, 60, 80);
-  g.fillStyle = '#d7b078'; g.fillRect(660, 190, 70, 90);
-  // ventana derecha
-  g.fillStyle = '#fff3c9'; g.fillRect(925, 30, 185, 385);
-  g.fillStyle = '#c78f50'; g.fillRect(925, 30, 185, 10); g.fillRect(925, 405, 185, 12);
-  g.fillRect(1008, 30, 9, 385); g.fillRect(925, 150, 185, 9); g.fillRect(925, 272, 185, 9);
-  const wg = g.createRadialGradient(1010, 230, 10, 1010, 230, 300);
-  wg.addColorStop(0, 'rgba(255,244,200,.8)'); wg.addColorStop(1, 'rgba(255,244,200,0)');
-  g.fillStyle = wg; g.fillRect(700, -50, 420, 560);
-  // zócalo madera
-  g.fillStyle = '#8a4e2c'; g.fillRect(0, 395, SW, 75);
-  g.fillStyle = '#ab683b'; g.fillRect(0, 392, SW, 10);
-  g.fillStyle = 'rgba(50,20,8,.28)'; for (let x = 0; x < SW; x += 58) g.fillRect(x, 404, 4, 66);
-  // suelo
-  gr = g.createLinearGradient(0, 465, 0, SH); gr.addColorStop(0, '#74401f'); gr.addColorStop(1, '#4f2815');
-  g.fillStyle = gr; g.fillRect(0, 465, SW, SH);
-  // mostrador izquierdo
-  g.fillStyle = '#5a3320'; g.fillRect(0, 170, 280, 14);
-  g.fillStyle = '#6b3d26'; g.fillRect(0, 184, 270, 118);
-  const mugs = ['#e9e1d6', '#d96b4a', '#7fb0c9', '#f0c660', '#e9e1d6'];
-  for (let i = 0; i < 5; i++) { g.fillStyle = mugs[i]; rr(g, 14 + i * 50, 258, 34, 36, 8); g.fill(); g.fillRect(14 + i * 50, 224, 30, 4); g.fillRect(18 + i * 50, 200, 22, 24); }
-  g.fillStyle = '#7a4527'; g.fillRect(0, 300, 380, 170);
-  g.fillStyle = '#b07040'; g.fillRect(0, 296, 390, 14);
-  g.fillStyle = '#9ca4ae'; rr(g, 40, 238, 120, 62, 8); g.fill();
-  g.fillStyle = '#6d7684'; g.fillRect(52, 250, 28, 30); g.fillRect(100, 250, 40, 22);
-  g.fillStyle = '#d8d1c4'; rr(g, 200, 262, 50, 36, 6); g.fill(); rr(g, 262, 272, 44, 26, 6); g.fill();
-  // lámparas
-  lamp(g, 210, 150, 1.0); lamp(g, 505, 170, 1.15); lamp(g, 790, 230, 1.0); lamp(g, 1055, 120, 1.5); lamp(g, 1000, 235, 1.1);
-  if (PORTRAIT) {
-    g.fillStyle = '#e9c48f'; g.fillRect(430, -230, 90, 120); g.fillRect(740, -330, 100, 130);
-    g.fillStyle = '#b57f4a'; g.fillRect(440, -220, 70, 100); g.fillRect(750, -320, 80, 110);
-    g.fillStyle = '#7b4426'; g.fillRect(560, -170, 220, 14);
-    g.fillStyle = '#e9e1d6'; rr(g, 590, -200, 34, 30, 8); g.fill(); rr(g, 640, -196, 30, 26, 8); g.fill();
-    leafPlant(g, 730, -170, 70, ['#4d8a3f', '#3a7a35', '#5a9a46'], 7);
-    lamp(g, 440, -120, 1.1); lamp(g, 700, -40, 1.0); lamp(g, 560, -300, 1.2); lamp(g, 860, -210, 1.0); lamp(g, 360, -380, 1.0);
-  }
-  // plantas colgantes
-  g.strokeStyle = '#4a2b18'; g.lineWidth = 3;
-  g.beginPath(); g.moveTo(615, topY); g.lineTo(615, 270); g.stroke();
-  g.beginPath(); g.moveTo(330, 240); g.lineTo(330, 300); g.stroke();
-  leafPlant(g, 335, 330, 95, ['#4d8a3f', '#3a7a35', '#5a9a46'], 9);
-  leafPlant(g, 720, 330, 110, ['#4d8a3f', '#3a7a35', '#5a9a46'], 9);
-  g.fillStyle = '#a56a3a'; rr(g, 695, 325, 50, 28, 8); g.fill();
-  g.fillStyle = '#a56a3a'; rr(g, 305, 320, 60, 30, 8); g.fill();
-  // planta central de fondo
-  leafPlant(g, 395, 430, 150, ['#4d8a3f', '#3c7c36', '#5f9a49'], 11);
-  g.fillStyle = '#9a6a48'; rr(g, 355, 420, 80, 50, 10); g.fill();
-  // mesa y silla traseras
-  g.fillStyle = '#9c5f33'; g.fillRect(160, 425, 230, 14); g.fillRect(185, 439, 14, 70); g.fillRect(345, 439, 14, 70);
-  g.fillStyle = '#7d4524'; rr(g, 440, 360, 70, 120, 12); g.fill(); g.fillRect(445, 470, 12, 60); g.fillRect(495, 470, 12, 60);
-  // clientes
-  g.fillStyle = '#9c5f33'; g.fillRect(1080 - 260, 440, 280, 16);
-  g.fillStyle = '#7b4426'; rr(g, 1010, 330, 100, 220, 16); g.fill();
-  person(g, 735, 310, '#3d3a3a', '#5a9aa6', '#e0b08a');
-  person(g, 885, 305, '#b5532b', '#bda68b', '#efc4a0');
-  person(g, 1040, 318, '#4e2a1a', '#a83a2e', '#d89d78');
-  g.fillStyle = '#e9e1d6'; g.fillRect(930, 428, 28, 22);
-  // planta primer plano izquierda
-  leafPlant(g, 105, 520, 260, ['#3f8f3a', '#2f7a30', '#56a444', '#37852f'], 12);
-  g.fillStyle = '#e1c5a8'; rr(g, 40, 520, 140, 110, 14); g.fill();
-  g.fillStyle = '#c9a888'; g.fillRect(40, 520, 140, 14);
-  // pizarra / cuadros
-  g.fillStyle = '#3b2a22'; g.fillRect(560, 120, 90, 60);
-  // ampliar (desenfoque)
-  const B = makeLayer(W, BH, 1), bg2 = B.g;
-  bg2.imageSmoothingEnabled = true; bg2.imageSmoothingQuality = 'high';
-  bg2.drawImage(S.c, 0, 0, W, BH);
-  const gy = BASE_Y - 50;
-  let g2 = bg2.createRadialGradient(W / 2, gy, 60, W / 2, gy, 520);
-  g2.addColorStop(0, 'rgba(255,225,160,.16)'); g2.addColorStop(1, 'rgba(255,225,160,0)');
-  bg2.fillStyle = g2; bg2.fillRect(0, 0, W, BH);
-  const vi = PORTRAIT ? W * 0.5 : H * 0.4, vo = PORTRAIT ? H * 0.72 : W * 0.66;
-  g2 = bg2.createRadialGradient(W / 2, BH / 2, vi, W / 2, BH / 2, vo);
-  g2.addColorStop(0, 'rgba(50,20,6,0)'); g2.addColorStop(1, 'rgba(50,20,6,.5)');
-  bg2.fillStyle = g2; bg2.fillRect(0, 0, W, BH);
-  bg2.fillStyle = 'rgba(255,200,120,.06)'; bg2.fillRect(0, 0, W, BH);
-  return B;
+  return lista;
 }
 
-function buildTable() {
-  const T = makeLayer(W, 300, 1.5), g = T.g;
-  g.translate(PX - 550, -430);
-  g.lineJoin = 'round';
-  // madera
-  let gr = g.createLinearGradient(0, 440, 0, 730);
-  gr.addColorStop(0, '#bb7b40'); gr.addColorStop(1, '#8a4d25');
-  g.beginPath(); g.moveTo(290, 440); g.lineTo(810, 440); g.lineTo(1030, 730); g.lineTo(70, 730); g.closePath();
-  g.fillStyle = gr; g.fill();
-  g.strokeStyle = 'rgba(60,25,8,.5)'; g.lineWidth = 3;
-  [0.2, 0.5, 0.8].forEach(t => { g.beginPath(); g.moveTo(290 + 520 * t, 440); g.lineTo(70 + 960 * t, 730); g.stroke(); });
-  g.strokeStyle = 'rgba(70,30,10,.22)'; g.lineWidth = 1.5;
-  for (let i = 0; i < 26; i++) { const t = rnd(i * 9 + 3), y = 450 + rnd(i * 5 + 1) * 270; const xl = 290 - (y - 440) * 0.75, xr = 810 + (y - 440) * 0.76; const a = xl + (xr - xl) * t; g.beginPath(); g.moveTo(a, y); g.lineTo(a + 40 + rnd(i) * 60, y + 2); g.stroke(); }
-  g.beginPath(); g.moveTo(290, 440); g.lineTo(810, 440); g.lineTo(1030, 730); g.lineTo(70, 730); g.closePath();
-  g.strokeStyle = '#3b1a0b'; g.lineWidth = 4; g.stroke();
-  g.strokeStyle = '#e0a468'; g.lineWidth = 3; g.beginPath(); g.moveTo(296, 446); g.lineTo(804, 446); g.stroke();
-  // mantel
-  const TL = 340, TR = 760, BL = 150, BR = 950, Y0 = 452, Y1 = 730;
-  g.save();
-  g.beginPath(); g.moveTo(TL, Y0); g.lineTo(TR, Y0); g.lineTo(BR, Y1); g.lineTo(BL, Y1); g.closePath(); g.clip();
-  const N = 10, M = 14;
-  const yAt = t => Y0 + (Y1 - Y0) * (t * t * 0.55 + t * 0.45);
-  const xl = y => TL + (BL - TL) * ((y - Y0) / (Y1 - Y0)), xr = y => TR + (BR - TR) * ((y - Y0) / (Y1 - Y0));
-  for (let r = 0; r < N; r++) {
-    const ya = yAt(r / N), yb = yAt((r + 1) / N);
-    for (let i = 0; i < M; i++) {
-      const xa0 = xl(ya) + (xr(ya) - xl(ya)) * i / M, xa1 = xl(ya) + (xr(ya) - xl(ya)) * (i + 1) / M;
-      const xb0 = xl(yb) + (xr(yb) - xl(yb)) * i / M, xb1 = xl(yb) + (xr(yb) - xl(yb)) * (i + 1) / M;
-      g.fillStyle = (r + i) % 2 ? '#fdf2ec' : '#e8505b';
-      g.beginPath(); g.moveTo(xa0, ya); g.lineTo(xa1, ya); g.lineTo(xb1 + 0.6, yb + 0.6); g.lineTo(xb0 - 0.6, yb + 0.6); g.closePath(); g.fill();
+// Reemplaza {etiquetas} de una plantilla: rellenar('Hola {quien}', { quien: 'Ana' }) → 'Hola Ana'
+function rellenar(plantilla, datos) {
+  return plantilla
+    .replace(/\{(\w+)\}/g, (todo, clave) => (clave in datos ? String(datos[clave]) : todo))
+    .replace(/\bde el\b/g, 'del')
+    .replace(/\ba el\b/g, 'al');
+}
+
+function ponerTexto(el, texto) { if (el.textContent !== texto) el.textContent = texto; }
+
+
+/* =====================================================================
+   RELOJES — todos los "después de X ms" de una prueba pasan por aquí.
+   Así, cuando la prueba termina (o vuelves al inicio), se borran TODOS
+   de una vez y ninguno se cuela en la prueba siguiente.
+   ===================================================================== */
+function crearReloj() {
+  let turno = 0;                       // si cambia, los relojes viejos ya no hacen nada
+  const esperas = new Set(), cuadros = new Set();
+  return {
+    // Hace "funcion" dentro de "ms" milisegundos
+    despues(funcion, ms) {
+      const miTurno = turno;
+      const id = setTimeout(() => {
+        esperas.delete(id);
+        if (miTurno === turno) funcion();
+      }, Math.max(0, ms));
+      esperas.add(id);
+      return id;
+    },
+    cancelar(id) { clearTimeout(id); esperas.delete(id); },
+    // Hace "funcion" en cada cuadro de la pantalla (~60 por segundo) hasta que devuelva false
+    cadaCuadro(funcion) {
+      const miTurno = turno;
+      let id = 0;
+      const paso = (ahora) => {
+        cuadros.delete(id);
+        if (miTurno !== turno || funcion(ahora) === false) return;
+        id = requestAnimationFrame(paso);
+        cuadros.add(id);
+      };
+      id = requestAnimationFrame(paso);
+      cuadros.add(id);
+    },
+    limpiar() {
+      turno++;
+      esperas.forEach(clearTimeout);
+      esperas.clear();
+      cuadros.forEach(cancelAnimationFrame);
+      cuadros.clear();
+    },
+    pendientes: () => esperas.size + cuadros.size,
+  };
+}
+const relojPrueba = crearReloj();    // los tiempos de la prueba que se está jugando
+const relojCrono = crearReloj();     // la barra de tiempo de la prueba
+const relojPantalla = crearReloj();  // cuenta regresiva, sello de fin, contador del final
+
+function limpiarPrueba() {
+  relojPrueba.limpiar();
+  relojCrono.limpiar();
+  cronActual = null;
+  control = null;
+}
+
+// Cronómetro con barra: se congela en la pausa y se puede "castigar" (restar segundos)
+function crearCronometro(segundos, alTerminar) {
+  relojCrono.limpiar();
+  const total = (segundos * 1000) / FACTOR;
+  let gastado = 0, desde = performance.now(), pausado = false, castigo = 0;
+  const barra = $('barraTiempo'), relleno = $('barraTiempoRelleno'), texto = $('pruebaTiempo');
+  barra.hidden = false;
+  const c = {
+    restante() {
+      const corriendo = pausado ? 0 : performance.now() - desde;
+      return Math.max(0, total - gastado - corriendo - castigo);
+    },
+    pausar() { if (!pausado) { gastado += performance.now() - desde; pausado = true; } },
+    reanudar() { if (pausado) { desde = performance.now(); pausado = false; } },
+    castigar(seg) { castigo += (seg * 1000) / FACTOR; },
+  };
+  cronActual = c;
+  const dibujar = () => {
+    const r = c.restante();
+    relleno.style.width = ((r / total) * 100).toFixed(2) + '%';
+    const poco = r <= (CONFIG.ULTIMOS_SEGUNDOS * 1000) / FACTOR;
+    barra.classList.toggle('poco', poco);
+    texto.classList.toggle('tiempo-poco', poco);
+    ponerTexto(texto, TEXTOS.TIEMPO(Math.ceil(r / 1000)));
+    return r;
+  };
+  dibujar();
+  relojCrono.cadaCuadro(() => {
+    const r = dibujar();
+    if (r <= 0 && !pausado) { alTerminar(); return false; }
+    return true;
+  });
+  return c;
+}
+
+
+/* =====================================================================
+   LO QUE CADA PRUEBA PUEDE USAR ("juego")
+   ===================================================================== */
+function crearJuego(prueba, token) {
+  const activa = () => estado === 'prueba' && turnoPrueba === token;
+  return {
+    area: $('areaPrueba'),
+    config: prueba.config || {},
+    activa,                                                      // true mientras se aceptan toques
+    // sello (opcional): el cartel que sale al terminar; si no se pone, "¡Listo!" o "¡Tiempo!"
+    terminar: (valor, detalle, sello) => terminarPrueba(token, valor, detalle, sello),
+    // sinAcelerar = true: este tiempo NO se divide con ?rapido=1
+    despues: (funcion, ms, sinAcelerar) => relojPrueba.despues(funcion, sinAcelerar ? ms : dur(ms)),
+    cancelar: (id) => relojPrueba.cancelar(id),
+    limpiarTodo: () => relojPrueba.limpiar(),                    // borra los "después" pendientes (no el cronómetro)
+    alProximoCuadro: (funcion) => relojPrueba.cadaCuadro((t) => { funcion(t); return false; }),
+    estado: (texto) => ponerTexto($('pruebaEstado'), texto),
+    cronometro: (segundos, alTerminar) => crearCronometro(segundos, alTerminar),
+    sonar: (nombre) => sonar(SONIDOS[nombre] || []),
+    nota: (i) => tonoMemoria(i),
+    sacudir: (el) => sacudir(el || $('tablero')),
+    destello: destellar,
+    anunciar,
+    boton(texto, alTocar) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'btn principal grande';
+      b.style.margin = 'auto';
+      b.textContent = texto;
+      b.addEventListener('click', () => { if (activa()) alTocar(); });
+      $('areaPrueba').appendChild(b);
+      return b;
+    },
+  };
+}
+
+
+/* =====================================================================
+   PRUEBA ⚡ REFLEJOS  (ajustes en 🔧 REFLEJOS)
+   ===================================================================== */
+function empezarReflejos(juego) {
+  const C = CONFIG.REFLEJOS;
+  const resultados = [];             // { ms, tipo: 'ok' | 'castigo' | 'lento' } de cada ronda
+  let ronda = 0;                     // rondas ya terminadas
+  let prontos = 0, prontosTotal = 0; // veces "muy pronto" en esta ronda / en total
+  let fase = 'entre';                // 'espera' (rojo) | 'ya' (verde) | 'pronto' (naranja) | 'entre' (mostrando tu tiempo)
+  let momentoVerde = 0;
+  let idVerde = null, idLimite = null;
+
+  juego.area.innerHTML = `
+    <div class="zona-reflejos entre" id="zonaReflejos" tabindex="-1">
+      <span class="zr-grande" id="zrGrande"></span>
+      <span class="zr-chica" id="zrChica"></span>
+    </div>
+    <ol class="rondas" id="rondas"></ol>`;
+  const zona = $('zonaReflejos');
+  // pointerdown (y no "click"): reacciona en cuanto el dedo o el mouse BAJA, sin esperar a que suba
+  zona.addEventListener('pointerdown', (e) => {
+    if (!e.isPrimary || e.button > 0) return;
+    e.preventDefault();
+    tocar(e.timeStamp);
+  });
+
+  // Cambia el color de la zona (sin borrar otras clases, como la del temblor)
+  function pintar(clase, grande, chica) {
+    zona.classList.remove('entre', 'espera', 'ya', 'pronto');
+    zona.classList.add(clase);
+    ponerTexto($('zrGrande'), grande);
+    ponerTexto($('zrChica'), chica);
+  }
+  function pintarRondas() {
+    const ol = $('rondas');
+    ol.textContent = '';
+    for (let i = 0; i < C.RONDAS; i++) {
+      const li = document.createElement('li');
+      const r = resultados[i];
+      li.textContent = TEXTOS.REFLEJOS_FICHA(i + 1, r ? TEXTOS.REFLEJOS_MS(r.ms) : '—');
+      if (r && r.tipo !== 'ok') li.className = 'castigo';
+      else if (i === ronda && fase !== 'entre') li.className = 'actual';
+      ol.appendChild(li);
     }
   }
-  gr = g.createLinearGradient(0, Y0, 0, Y1); gr.addColorStop(0, 'rgba(255,230,190,.12)'); gr.addColorStop(1, 'rgba(90,20,20,.16)');
-  g.fillStyle = gr; g.fillRect(0, Y0, 1100, Y1 - Y0);
-  g.restore();
-  g.beginPath(); g.moveTo(TL, Y0); g.lineTo(TR, Y0); g.lineTo(BR, Y1); g.lineTo(BL, Y1);
-  g.strokeStyle = '#4a1c12'; g.lineWidth = 3.5; g.stroke();
-  g.beginPath(); g.moveTo(TL, Y0); g.lineTo(TR, Y0); g.strokeStyle = '#4a1c12'; g.stroke();
-  return T;
-}
-
-/* ================= DIBUJO DE WAFFLE ================= */
-function drawWaffle(c, cx, y, w, o) {
-  o = o || {};
-  const rx = w / 2, ry = Math.max(5, w * 0.15), bot = y + TH, s = o.seed || 1;
-  c.save(); c.lineJoin = 'round'; c.lineCap = 'round';
-  // cuerpo
-  c.beginPath(); c.moveTo(cx - rx, y); c.lineTo(cx - rx, bot);
-  c.ellipse(cx, bot, rx, ry, 0, Math.PI, 0, true);
-  c.lineTo(cx + rx, y); c.ellipse(cx, y, rx, ry, 0, 0, Math.PI, true); c.closePath();
-  let g = c.createLinearGradient(0, y, 0, bot + ry);
-  g.addColorStop(0, '#f2b64a'); g.addColorStop(0.55, '#d58c28'); g.addColorStop(1, '#a5601a');
-  c.fillStyle = g; c.fill();
-  g = c.createLinearGradient(cx - rx, 0, cx + rx, 0);
-  g.addColorStop(0, 'rgba(70,30,5,.32)'); g.addColorStop(0.28, 'rgba(70,30,5,0)');
-  g.addColorStop(0.72, 'rgba(70,30,5,0)'); g.addColorStop(1, 'rgba(70,30,5,.32)');
-  c.fillStyle = g; c.fill();
-  c.lineWidth = 3.5; c.strokeStyle = '#4f2410'; c.stroke();
-  // cara superior
-  c.beginPath(); c.ellipse(cx, y, rx, ry, 0, 0, TAU);
-  g = c.createRadialGradient(cx, y - ry * 0.2, 1, cx, y, rx);
-  g.addColorStop(0, '#ffe08a'); g.addColorStop(0.7, '#f1b546'); g.addColorStop(1, '#cf8a2c');
-  c.fillStyle = g; c.fill(); c.lineWidth = 3.5; c.stroke();
-  c.beginPath(); c.ellipse(cx, y, rx * 0.9, ry * 0.88, 0, 0, TAU);
-  c.strokeStyle = 'rgba(170,95,25,.55)'; c.lineWidth = 2.5; c.stroke();
-  // cuadrícula
-  if (w > 40) {
-    c.save(); c.beginPath(); c.ellipse(cx, y, rx * 0.84, ry * 0.82, 0, 0, TAU); c.clip();
-    c.translate(cx, y); c.scale(1, ry / rx);
-    const sp = Math.max(10, rx * 0.27), lw = Math.max(2.5, rx * 0.06);
-    for (let pass = 0; pass < 2; pass++) {
-      c.save();
-      if (pass === 0) { c.translate(1.5, 1.5); c.strokeStyle = 'rgba(255,230,150,.7)'; } else c.strokeStyle = 'rgba(150,78,18,.78)';
-      c.lineWidth = lw; c.beginPath();
-      for (let gx = -Math.floor(rx / sp) * sp; gx <= rx; gx += sp) { c.moveTo(gx, -rx); c.lineTo(gx, rx); }
-      for (let gy = -Math.floor(rx / sp) * sp; gy <= rx; gy += sp) { c.moveTo(-rx, gy); c.lineTo(rx, gy); }
-      c.stroke(); c.restore();
+  function cancelarRonda() {
+    juego.cancelar(idVerde);
+    juego.cancelar(idLimite);
+  }
+  function empezarRonda() {
+    cancelarRonda();
+    fase = 'espera';
+    pintar('espera', TEXTOS.REFLEJOS_ESPERA, TEXTOS.REFLEJOS_ESPERA_SUB);
+    juego.estado(TEXTOS.REFLEJOS_RONDA(ronda + 1, C.RONDAS));
+    pintarRondas();
+    const espera = C.ESPERA_MIN + Math.random() * (C.ESPERA_MAX - C.ESPERA_MIN);
+    idVerde = juego.despues(ponerVerde, espera);
+  }
+  function ponerVerde() {
+    fase = 'ya';
+    pintar('ya', TEXTOS.REFLEJOS_YA, TEXTOS.REFLEJOS_YA_SUB);
+    juego.sonar('YA');
+    anunciar(TEXTOS.REFLEJOS_YA);
+    momentoVerde = performance.now();
+    // El verde se ve en pantalla en el próximo cuadro: se mide desde ahí (es más justo)
+    juego.alProximoCuadro((t) => { if (fase === 'ya' && t > momentoVerde) momentoVerde = t; });
+    // Este límite es tiempo real: no se divide con ?rapido=1
+    idLimite = juego.despues(() => registrar(C.LIMITE, 'lento'), C.LIMITE, true);
+  }
+  function tocar(momento) {
+    if (!juego.activa()) return;
+    if (fase === 'espera') { temprano(false); return; }
+    if (fase !== 'ya') return;                       // mostrando un mensaje: no cuenta
+    let ms = momento - momentoVerde;
+    if (!(ms > -50 && ms < 60000)) ms = performance.now() - momentoVerde;   // por si el navegador da una hora rara
+    if (ms < C.MINIMO_HUMANO) { temprano(true); return; }
+    registrar(Math.round(ms), 'ok');
+  }
+  function temprano(adivino) {
+    cancelarRonda();
+    prontos++;
+    prontosTotal++;
+    juego.sonar('MAL');
+    vibrar();
+    if (prontos >= C.MAX_PRONTOS) registrar(C.CASTIGO_PRONTO, 'castigo');
+    else {
+      fase = 'pronto';
+      const sub = adivino ? TEXTOS.REFLEJOS_ADIVINO_SUB : TEXTOS.REFLEJOS_PRONTO_SUB;
+      pintar('pronto', TEXTOS.REFLEJOS_PRONTO, sub);
+      anunciar(`${TEXTOS.REFLEJOS_PRONTO} ${sub}`);
+      juego.despues(empezarRonda, C.PAUSA_PRONTO);
     }
-    c.restore();
+    juego.sacudir(zona);                             // el temblor va DESPUÉS de pintar la zona
   }
-  // glaseado de jarabe
-  if (o.syrup && w > 50) {
-    c.save(); c.beginPath(); c.ellipse(cx, y, rx * 0.95, ry * 0.95, 0, 0, TAU); c.clip();
-    c.beginPath(); c.ellipse(cx + rx * 0.12, y + ry * 0.06, rx * 0.78, ry * 0.7, 0, 0, TAU);
-    c.fillStyle = 'rgba(205,110,25,.5)'; c.fill();
-    c.beginPath(); c.ellipse(cx - rx * 0.3, y - ry * 0.1, rx * 0.14, ry * 0.12, -0.3, 0, TAU);
-    c.fillStyle = 'rgba(255,230,160,.55)'; c.fill(); c.restore();
+  function registrar(ms, tipo) {
+    cancelarRonda();
+    resultados.push({ ms, tipo });
+    ronda++;
+    prontos = 0;
+    fase = 'entre';
+    if (tipo === 'ok') { pintar('entre', TEXTOS.REFLEJOS_MS(ms), TEXTOS.REFLEJOS_BUENO_SUB); juego.sonar('BIEN'); anunciar(TEXTOS.REFLEJOS_MS(ms)); }
+    else if (tipo === 'lento') { pintar('entre', TEXTOS.REFLEJOS_LENTO, TEXTOS.REFLEJOS_LENTO_SUB(ms)); juego.sonar('MAL'); anunciar(`${TEXTOS.REFLEJOS_LENTO} ${TEXTOS.REFLEJOS_LENTO_SUB(ms)}`); }
+    else { pintar('entre', TEXTOS.REFLEJOS_CASTIGO, TEXTOS.REFLEJOS_CASTIGO_SUB(ms)); anunciar(`${TEXTOS.REFLEJOS_CASTIGO}. ${TEXTOS.REFLEJOS_CASTIGO_SUB(ms)}`); }
+    pintarRondas();
+    juego.despues(ronda >= C.RONDAS ? terminar : empezarRonda, C.PAUSA_ENTRE_RONDAS);
   }
-  // mantequilla
-  if (o.butter && w > 50) {
-    const bw = rx * 0.36, by = y - ry * 0.12;
-    c.beginPath(); c.ellipse(cx, by + bw * 0.12, bw * 1.5, bw * 0.55, 0, 0, TAU);
-    c.fillStyle = 'rgba(255,208,70,.9)'; c.fill(); c.lineWidth = 2; c.strokeStyle = 'rgba(176,110,20,.6)'; c.stroke();
-    rr(c, cx - bw / 2, by - bw * 0.5, bw, bw * 0.5, bw * 0.12); c.fillStyle = '#fff3a8'; c.fill();
-    c.lineWidth = 2.2; c.strokeStyle = '#8a5a12'; c.stroke();
-    rr(c, cx - bw / 2, by, bw, bw * 0.28, bw * 0.1); c.fillStyle = '#ffd24a'; c.fill(); c.stroke();
-    c.fillStyle = 'rgba(255,255,255,.7)'; c.fillRect(cx - bw * 0.36, by - bw * 0.4, bw * 0.28, bw * 0.08);
-  }
-  // brillo
-  c.beginPath(); c.ellipse(cx - rx * 0.4, y - ry * 0.5, rx * 0.2, ry * 0.1, -0.3, 0, TAU);
-  c.fillStyle = 'rgba(255,255,255,.3)'; c.fill();
-  // carita
-  if (o.face !== false && w >= 60) {
-    const fs = Math.min(TH * 0.5, w * 0.13), fy = y + ry + TH * 0.5, v = Math.floor(rnd(s + 5) * 3), ex = fs * 0.95;
-    c.strokeStyle = '#4a2410'; c.lineWidth = Math.max(1.6, fs * 0.13);
-    for (const sd of [-1, 1]) {
-      const ex1 = cx + sd * ex, ey = fy - fs * 0.12;
-      c.fillStyle = 'rgba(255,100,100,.55)';
-      c.beginPath(); c.ellipse(cx + sd * (ex + fs * 0.62), fy + fs * 0.14, fs * 0.2, fs * 0.13, 0, 0, TAU); c.fill();
-      if (v === 1 || (v === 2 && sd === 1)) { c.beginPath(); c.arc(ex1, ey + fs * 0.1, fs * 0.2, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); }
-      else {
-        c.fillStyle = '#4a2410'; c.beginPath(); c.ellipse(ex1, ey, fs * 0.13, fs * 0.19, 0, 0, TAU); c.fill();
-        c.fillStyle = '#fff'; c.beginPath(); c.arc(ex1 - fs * 0.04, ey - fs * 0.07, fs * 0.05, 0, TAU); c.fill();
-      }
-    }
-    c.beginPath(); c.arc(cx, fy + fs * 0.02, fs * 0.3, Math.PI * 0.15, Math.PI * 0.85); c.stroke();
-  }
-  // gotas de jarabe
-  if (o.syrup && w > 60) {
-    const n = w > 120 ? 3 : 2;
-    for (let i = 0; i < n; i++) {
-      const sg = (i % 2 ? 1 : -1), k = sg * (0.38 + 0.42 * rnd(s + i * 7));
-      const dx = cx + k * rx, ex = y + ry * Math.sqrt(1 - k * k), len = TH * (0.45 + 0.5 * rnd(s + i * 13 + 2)), dw = Math.max(6, rx * 0.09);
-      c.beginPath(); c.moveTo(dx - dw / 2, ex - 3); c.lineTo(dx - dw / 2, ex + len);
-      c.arc(dx, ex + len, dw / 2, Math.PI, 0, true); c.lineTo(dx + dw / 2, ex - 3); c.closePath();
-      g = c.createLinearGradient(dx - dw / 2, 0, dx + dw / 2, 0); g.addColorStop(0, '#e48a22'); g.addColorStop(1, '#c4651a');
-      c.fillStyle = g; c.fill(); c.lineWidth = 2; c.strokeStyle = '#7a3a10'; c.stroke();
-      c.fillStyle = 'rgba(255,230,160,.7)'; c.fillRect(dx - dw * 0.28, ex + 2, dw * 0.15, len * 0.6);
-    }
-  }
-  c.restore();
-}
-
-/* ================= ESTADO DEL JUEGO ================= */
-let state = 'swing';
-let layers = [], pieces = [], parts = [], floaters = [];
-let held = null, drop = null, lastW = BASE_W;
-let score = 0, best = 0, bestStart = 0, newRecord = false, streak = 0;
-let clawX = 300, dir = 1, open = 0, openT = 0;
-let camY = 0, camTarget = 0, shake = 0, scorePop = 0, time = 0;
-let hintA = 1, started = false, settleT = 0, collT = 0, panelT = 0, btnPulse = 0;
-try { best = parseInt(localStorage.getItem('wdc_best') || '0', 10) || 0; } catch (e) {}
-
-function applyLayout(nw, nh) {
-  const oPX = PX, oBY = BASE_Y;
-  W = nw; H = nh; PORTRAIT = H > W;
-  PX = W / 2; PY = H - 91; BASE_Y = PY - 38;
-  HOLD_Y = BASE_Y - (PORTRAIT ? 330 : 252); CAM_LINE = BASE_Y - 80;
-  BASE_W = PORTRAIT ? 170 : 190; MARGIN = PORTRAIT ? 105 : 140; SPD = Math.max(0.6, W / 1100);
-  SND.x = W - 48;
-  bg = buildBG(); table = buildTable();
-  const dx = PX - oPX, dy = BASE_Y - oBY;
-  if ((dx || dy) && layers.length) {
-    layers.forEach(l => { l.x += dx; l.y += dy; });
-    pieces.forEach(p => { p.px += dx; p.py += dy; p.cx += dx; p.l += dx; p.r += dx; });
-    parts.forEach(p => { p.x += dx; p.y += dy; });
-    floaters.forEach(f => { f.x += dx; f.y += dy; });
-    if (drop) { drop.x += dx; drop.y += dy; }
-    clawX = clamp(clawX + dx, MARGIN, W - MARGIN);
-  }
-}
-function saveBest() { try { localStorage.setItem('wdc_best', String(best)); } catch (e) {} }
-
-function spawnHeld(w) {
-  held = { w, seed: (Math.random() * 1e6) | 0, butter: Math.random() < 0.35, syrup: Math.random() < 0.6, scale: 0.4 };
-  lastW = w; openT = 0;
-}
-function resetGame() {
-  layers = [{ x: PX, w: BASE_W, y: BASE_Y, seed: 21, butter: true, syrup: true, bt: 9 }];
-  pieces = []; parts = []; floaters = []; drop = null;
-  score = 0; streak = 0; camY = 0; camTarget = 0; shake = 0; scorePop = 0;
-  clawX = 320; dir = 1; open = 0; openT = 0; hintA = 1; started = false;
-  bestStart = best; newRecord = false; panelT = 0; state = 'swing';
-  spawnHeld(BASE_W);
-}
-
-/* ================= PARTÍCULAS ================= */
-function addPart(p) { if (parts.length >= 220) parts.shift(); parts.push(p); }
-function dust(x, y, sd) {
-  for (let i = 0; i < 4; i++) addPart({ t: 'dust', x: x + (Math.random() - 0.5) * 8, y: y + (Math.random() - 0.5) * 6, vx: sd * (30 + Math.random() * 110), vy: -15 - Math.random() * 45, g: 0, life: 0.55, max: 0.55, s: 6 + Math.random() * 7, rot: 0, vr: 0 });
-}
-function sparkle(x, y, n) {
-  for (let i = 0; i < n; i++) {
-    const a = Math.random() * TAU, sp = 120 + Math.random() * 280, star_ = i % 3 === 0;
-    addPart({ t: star_ ? 'star' : 'spark', x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 120, g: 700, life: 0.7 + Math.random() * 0.5, max: 1.1, s: star_ ? 9 + Math.random() * 6 : 3 + Math.random() * 3, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 8 });
-  }
-  addPart({ t: 'ring', x, y, vx: 0, vy: 0, g: 0, life: 0.45, max: 0.45, s: 20, rot: 0, vr: 0 });
-}
-function floater(text, x, y, size, color, big) { floaters.push({ text, x, y, size, color, t: 0, max: big ? 1.0 : 0.7, big }); }
-
-/* ================= ACCIONES ================= */
-function release() {
-  if (state !== 'swing' || !held) return;
-  state = 'drop'; started = true;
-  drop = { x: clawX, y: HOLD_Y - camY, vy: 0, w: held.w, seed: held.seed, butter: held.butter, syrup: held.syrup };
-  held = null; openT = 1; sfx.release();
-}
-function mkPiece(d, y, l, r, side) {
-  pieces.push({ cx: d.x, w: d.w, seed: d.seed, butter: d.butter, syrup: d.syrup, l, r, px: (l + r) / 2, py: y + TH / 2,
-    vx: side * (70 + Math.random() * 90), vy: -130 - Math.random() * 60, rot: 0, vr: side * (2 + Math.random() * 2.5), life: 0.95, delay: 0, side });
-}
-function land() {
-  const top = layers[layers.length - 1], y = top.y - TH;
-  const nl = drop.x - drop.w / 2, nr = drop.x + drop.w / 2, tl = top.x - top.w / 2, tr = top.x + top.w / 2;
-  const L = Math.max(nl, tl), R = Math.min(nr, tr), ov = R - L;
-  if (ov < 5) { miss(); return; }
-  let nx, nw, perfect = Math.abs(drop.x - top.x) <= 7;
-  if (perfect) {
-    nx = top.x; nw = drop.w; streak++;
-    if (streak >= 2) nw = Math.min(BASE_W, nw + 6);
-  } else {
-    streak = 0; nx = (L + R) / 2; nw = ov;
-    let cut = false;
-    if (nl < tl - 0.5) { mkPiece(drop, y, nl, tl, -1); cut = true; }
-    if (nr > tr + 0.5) { mkPiece(drop, y, tr, nr, 1); cut = true; }
-    if (cut) sfx.cut();
-  }
-  layers.push({ x: nx, w: nw, y, seed: drop.seed, butter: drop.butter, syrup: drop.syrup, bt: 0 });
-  const add = perfect ? 2 : 1;
-  score += add; scorePop = 1;
-  if (score > best) { best = score; saveBest(); }
-  if (score > bestStart) newRecord = true;
-  const ry = Math.max(5, nw * 0.15);
-  dust(nx - nw / 2, y + TH + ry * 0.4, -1); dust(nx + nw / 2, y + TH + ry * 0.4, 1);
-  if (perfect) {
-    sparkle(nx, y + 6, 18); shake = 7; sfx.perfect();
-    floater('PERFECT!', nx, y - 62, 44, '#ffd93d', true); floater('+2', nx, y - 22, 26, '#ffffff', false);
-  } else {
-    sfx.land(); floater('+1', nx, y - ry - 22, 26, '#ffffff', false);
-  }
-  drop = null; state = 'settle'; settleT = 0.5;
-}
-function miss() {
-  state = 'collapse'; collT = 1.25;
-  const top = layers[layers.length - 1], dn = drop.x >= top.x ? 1 : -1;
-  pieces.push({ cx: drop.x, w: drop.w, seed: drop.seed, butter: drop.butter, syrup: drop.syrup, l: drop.x - drop.w / 2, r: drop.x + drop.w / 2,
-    px: drop.x, py: drop.y + TH / 2, vx: dn * 150, vy: 0, rot: 0, vr: dn * 3, life: 1.4, delay: 0, side: 0 });
-  const tmp = [], n = Math.min(14, layers.length - 1);
-  for (let i = 0; i < n; i++) {
-    const l = layers.pop();
-    tmp.push({ cx: l.x, w: l.w, seed: l.seed, butter: l.butter, syrup: l.syrup, l: l.x - l.w / 2, r: l.x + l.w / 2, px: l.x, py: l.y + TH / 2,
-      vx: dn * (50 + Math.random() * 170) + (Math.random() - 0.5) * 90, vy: -60 - Math.random() * 80, rot: 0,
-      vr: (Math.random() < 0.5 ? -1 : 1) * (1 + Math.random() * 2.5), life: 1.6, delay: i * 0.05, side: 0 });
-  }
-  for (let i = tmp.length - 1; i >= 0; i--) pieces.push(tmp[i]);
-  drop = null; shake = 10; sfx.over();
-}
-
-/* ================= UPDATE ================= */
-function update(dt) {
-  time += dt;
-  const top = layers[layers.length - 1];
-  camTarget = Math.max(0, CAM_LINE - top.y);
-  camY += (camTarget - camY) * (1 - Math.exp(-3.5 * dt));
-  shake *= Math.exp(-8 * dt); if (shake < 0.05) shake = 0;
-  open += (openT - open) * Math.min(1, dt * 16);
-  scorePop = Math.max(0, scorePop - dt * 4);
-  if (started) hintA = Math.max(0, hintA - dt * 3.5);
-  for (const l of layers) l.bt += dt;
-
-  if (state === 'swing' && held) {
-    held.scale += (1 - held.scale) * Math.min(1, dt * 12);
-    const speed = Math.min(250 + layers.length * 11, 690) * SPD;
-    clawX += dir * speed * dt;
-    if (clawX > W - MARGIN) { clawX = W - MARGIN; dir = -1; }
-    if (clawX < MARGIN) { clawX = MARGIN; dir = 1; }
-  } else if (state === 'drop' && drop) {
-    drop.vy += GRAV * dt; drop.y += drop.vy * dt;
-    const target = top.y - TH;
-    if (drop.y >= target) {
-      const ov = Math.min(drop.x + drop.w / 2, top.x + top.w / 2) - Math.max(drop.x - drop.w / 2, top.x - top.w / 2);
-      if (ov >= 5) drop.y = target;
-      land();
-    }
-  } else if (state === 'settle') {
-    settleT -= dt;
-    if (settleT < 0.2) openT = 0;
-    if (settleT <= 0) { spawnHeld(layers[layers.length - 1].w); state = 'swing'; }
-  } else if (state === 'collapse') {
-    collT -= dt;
-    if (collT <= 0) { state = 'over'; panelT = 0; }
-  } else if (state === 'over') {
-    panelT += dt; btnPulse += dt;
+  function terminar() {
+    const promedio = Math.round(resultados.reduce((s, r) => s + r.ms, 0) / Math.max(1, resultados.length));
+    const lista = resultados.map((r) => (r.tipo === 'ok' ? '' : TEXTOS.REFLEJOS_CASTIGADA_ICONO) + TEXTOS.REFLEJOS_MS(r.ms));
+    juego.terminar(promedio, TEXTOS.REFLEJOS_DETALLE(lista, prontosTotal));
   }
 
-  for (let i = pieces.length - 1; i >= 0; i--) {
-    const p = pieces[i];
-    if (p.delay > 0) { p.delay -= dt; continue; }
-    p.vy += GRAV * dt; p.px += p.vx * dt; p.py += p.vy * dt; p.rot += p.vr * dt; p.life -= dt;
-    if (p.life <= 0 || p.py + camY > H + 260) pieces.splice(i, 1);
-  }
-  let k = 0;
-  for (let i = 0; i < parts.length; i++) {
-    const p = parts[i]; p.life -= dt;
-    if (p.life <= 0) continue;
-    p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.rot += p.vr * dt;
-    parts[k++] = p;
-  }
-  parts.length = k;
-  for (let i = floaters.length - 1; i >= 0; i--) { const f = floaters[i]; f.t += dt; f.y -= 28 * dt; if (f.t > f.max) floaters.splice(i, 1); }
+  empezarRonda();
+  return {
+    foco: zona,
+    pista: () => ({ fase }),
+    // Pausa: la ronda que iba se borra y al volver empieza de nuevo.
+    // (Lo que devuelve pausar() se muestra en la tarjeta de pausa.)
+    pausar() {
+      juego.limpiarTodo();
+      fase = 'entre';
+      pintar('entre', TEXTOS.PAUSA_TITULO, TEXTOS.REFLEJOS_PAUSA_SUB);
+      return TEXTOS.REFLEJOS_PAUSA_SUB;
+    },
+    reanudar() { if (ronda >= C.RONDAS) terminar(); else empezarRonda(); },
+    tecla(e) {
+      if (e.key !== ' ' && e.key !== 'Enter') return;
+      e.preventDefault();
+      if (!e.repeat) tocar(e.timeStamp);
+    },
+  };
 }
 
-/* ================= RENDER ================= */
-function drawPlate(c) {
-  c.save(); c.translate(0, PY - 528);
-  c.fillStyle = 'rgba(70,20,10,.32)'; c.beginPath(); c.ellipse(PX + 6, 548, 222, 60, 0, 0, TAU); c.fill();
-  c.beginPath(); c.ellipse(PX, 536, 205, 57, 0, 0, TAU); c.fillStyle = '#c3cfe2'; c.fill();
-  c.lineWidth = 3.5; c.strokeStyle = '#2b2a4a'; c.stroke();
-  c.beginPath(); c.ellipse(PX, 528, 205, 57, 0, 0, TAU); c.fillStyle = '#f8fafd'; c.fill(); c.stroke();
-  c.beginPath(); c.ellipse(PX, 528, 190, 52, 0, 0, TAU); c.strokeStyle = '#3b73c9'; c.lineWidth = 7; c.stroke();
-  const g = c.createRadialGradient(PX, 524, 10, PX, 528, 150);
-  g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#d4e2f4');
-  c.beginPath(); c.ellipse(PX, 528, 148, 38, 0, 0, TAU); c.fillStyle = g; c.fill();
-  c.lineWidth = 2; c.strokeStyle = 'rgba(70,100,160,.5)'; c.stroke();
-  c.beginPath(); c.ellipse(PX - 90, 506, 40, 6, -0.1, 0, TAU); c.fillStyle = 'rgba(255,255,255,.7)'; c.fill();
-  c.restore();
-}
-function drawLayer(c, l, idx) {
-  const bt = l.bt;
-  const b = bt < 1 ? Math.exp(-bt * 6) * Math.cos(bt * 26) : 0;
-  c.save();
-  if (b) { c.translate(l.x, l.y + TH); c.scale(1 + b * 0.05, 1 - b * 0.14); c.translate(-l.x, -(l.y + TH)); }
-  drawWaffle(c, l.x, l.y, l.w, { seed: l.seed, butter: l.butter && idx === layers.length - 1 || (idx === 0), syrup: l.syrup });
-  c.restore();
-}
-function drawClaw(c, x, w, o) {
-  const rx = w / 2, spread = o * 38, hy = HOLD_Y - 120;
-  // riel
-  let g = c.createLinearGradient(0, 38, 0, 56);
-  g.addColorStop(0, '#dfe5ec'); g.addColorStop(0.5, '#9aa5b3'); g.addColorStop(1, '#6b7787');
-  c.fillStyle = g; c.fillRect(0, 38, W, 16);
-  c.strokeStyle = '#2c3340'; c.lineWidth = 3; c.beginPath(); c.moveTo(0, 38); c.lineTo(W, 38); c.moveTo(0, 54); c.lineTo(W, 54); c.stroke();
-  c.strokeStyle = 'rgba(40,50,64,.55)'; c.lineWidth = 3; c.beginPath();
-  for (let sx = 6; sx < W; sx += 38) { c.moveTo(sx, 54); c.lineTo(sx + 14, 38); }
-  c.stroke();
-  // cable
-  c.fillStyle = '#9aa3b0'; c.fillRect(x - 6, 56, 12, hy - 48); c.strokeStyle = '#2c3340'; c.lineWidth = 2.5; c.strokeRect(x - 6, 56, 12, hy - 48);
-  // carro
-  g = c.createLinearGradient(0, 24, 0, 66); g.addColorStop(0, '#a9acc4'); g.addColorStop(1, '#6b6e8a');
-  rr(c, x - 32, 24, 64, 42, 9); c.fillStyle = g; c.fill(); c.lineWidth = 3.5; c.strokeStyle = '#2c2c3c'; c.stroke();
-  c.fillStyle = '#323347'; [[-20, 33], [20, 33]].forEach(p => { c.beginPath(); c.arc(x + p[0], p[1], 3.5, 0, TAU); c.fill(); });
-  c.fillStyle = 'rgba(255,255,255,.35)'; c.fillRect(x - 24, 29, 48, 4);
-  // brazos
-  for (const sd of [-1, 1]) {
-    c.beginPath(); c.moveTo(x + sd * 10, hy + 28);
-    c.lineTo(x + sd * (rx + 16 + spread), HOLD_Y - 28);
-    c.lineTo(x + sd * (rx + 2 + spread * 1.2), HOLD_Y + 18);
-    c.lineJoin = 'round'; c.lineCap = 'round';
-    c.strokeStyle = '#2c3340'; c.lineWidth = 13; c.stroke();
-    c.strokeStyle = '#b9c2cf'; c.lineWidth = 8; c.stroke();
-    c.strokeStyle = 'rgba(255,255,255,.65)'; c.lineWidth = 2; c.stroke();
-    c.beginPath(); c.arc(x + sd * (rx + 16 + spread), HOLD_Y - 28, 7, 0, TAU);
-    c.fillStyle = '#8b94a3'; c.fill(); c.lineWidth = 2.5; c.strokeStyle = '#2c3340'; c.stroke();
-  }
-  // varilla central
-  c.fillStyle = '#aab3c0'; rr(c, x - 6, hy + 42, 12, HOLD_Y - hy - 42 + 6, 5); c.fill(); c.lineWidth = 3; c.strokeStyle = '#2c3340'; c.stroke();
-  // buje
-  g = c.createLinearGradient(x - 18, 0, x + 18, 0); g.addColorStop(0, '#7f8999'); g.addColorStop(0.45, '#d2d9e2'); g.addColorStop(1, '#6b7584');
-  rr(c, x - 18, hy, 36, 54, 8); c.fillStyle = g; c.fill(); c.lineWidth = 3.5; c.strokeStyle = '#2c3340'; c.stroke();
-  c.fillStyle = '#4b5463'; c.fillRect(x - 18, hy + 16, 36, 6); c.fillRect(x - 18, hy + 32, 36, 6);
-}
-function card(x, y, w, h) {
-  rr(ctx, x, y + 5, w, h, 16); ctx.fillStyle = 'rgba(50,20,6,.5)'; ctx.fill();
-  rr(ctx, x, y, w, h, 16);
-  const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#fadfa8'); g.addColorStop(1, '#e0a050');
-  ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#4a2410'; ctx.stroke();
-  rr(ctx, x + 5, y + 5, w - 10, h - 10, 12); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,246,218,.75)'; ctx.stroke();
-}
-function crown(x, y) {
-  const c = ctx; c.save(); c.translate(x, y); c.lineJoin = 'round';
-  c.beginPath(); c.moveTo(-15, 11); c.lineTo(-18, -9); c.lineTo(-8, 0); c.lineTo(0, -13); c.lineTo(8, 0); c.lineTo(18, -9); c.lineTo(15, 11); c.closePath();
-  const g = c.createLinearGradient(0, -13, 0, 11); g.addColorStop(0, '#ffe55a'); g.addColorStop(1, '#f0a512');
-  c.fillStyle = g; c.fill(); c.lineWidth = 3; c.strokeStyle = '#4a2410'; c.stroke();
-  c.fillStyle = '#e8412f'; c.beginPath(); c.arc(0, 4, 3, 0, TAU); c.fill();
-  c.restore();
-}
-const SND = { x: W - 48, y: 108, r: 22 };
-function drawSound() {
-  const c = ctx; c.save(); c.translate(SND.x, SND.y);
-  c.beginPath(); c.arc(0, 4, SND.r, 0, TAU); c.fillStyle = 'rgba(50,20,6,.45)'; c.fill();
-  c.beginPath(); c.arc(0, 0, SND.r, 0, TAU);
-  const g = c.createLinearGradient(0, -SND.r, 0, SND.r); g.addColorStop(0, '#fadfa8'); g.addColorStop(1, '#e0a050');
-  c.fillStyle = g; c.fill(); c.lineWidth = 3.5; c.strokeStyle = '#4a2410'; c.stroke();
-  c.fillStyle = '#4a2410'; c.beginPath(); c.moveTo(-9, -4); c.lineTo(-4, -4); c.lineTo(3, -10); c.lineTo(3, 10); c.lineTo(-4, 4); c.lineTo(-9, 4); c.closePath(); c.fill();
-  c.strokeStyle = '#4a2410'; c.lineWidth = 2.6; c.lineCap = 'round';
-  if (muted) { c.beginPath(); c.moveTo(8, -5); c.lineTo(15, 5); c.moveTo(15, -5); c.lineTo(8, 5); c.stroke(); }
-  else { c.beginPath(); c.arc(3, 0, 8, -0.8, 0.8); c.stroke(); c.beginPath(); c.arc(3, 0, 13, -0.8, 0.8); c.stroke(); }
-  c.restore();
-}
-function drawHUD() {
-  const c = ctx;
-  card(21, 17, 206, 56); card(W - 21 - 220, 17, 220, 56);
-  c.save(); c.translate(21 + 103, 46); const s = 1 + 0.22 * Math.sin(scorePop * Math.PI); c.scale(s, s);
-  txt(c, 'SCORE: ' + score, 0, 2, 30, '#fff', '#3b1a0b', 7); c.restore();
-  crown(W - 21 - 220 + 40, 45);
-  txt(c, 'BEST: ' + Math.max(best, score), W - 21 - 220 + 128, 47, 30, '#fff', '#3b1a0b', 7);
-  drawSound();
-}
-function drawHint() {
-  if (hintA <= 0) return;
-  const c = ctx; c.save(); c.globalAlpha = hintA;
-  const hx = clamp(clawX, 120, W - 120), by = Math.sin(time * 6) * 7;
-  c.font = '80px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle';
-  c.fillText('☝️', hx, HOLD_Y + 100 + by);
-  c.strokeStyle = 'rgba(255,255,255,.9)'; c.lineWidth = 4; c.lineCap = 'round';
-  const ry = HOLD_Y + 50 + by * 0.6;
-  c.beginPath(); c.moveTo(hx - 30, ry); c.lineTo(hx - 42, ry - 8); c.moveTo(hx + 30, ry); c.lineTo(hx + 42, ry - 8); c.stroke();
-  txt(c, '¡TOCA PARA SOLTAR!', clamp(hx, 215, W - 215), HOLD_Y + 172, 32, '#fff', '#3b1a0b', 8);
-  c.restore();
-}
-function panelGeom() { return { x: W / 2 - 150, y: H / 2 + 98, w: 300, h: 62 }; }
-function drawOver() {
-  const c = ctx, p = clamp(panelT / 0.45, 0, 1), k = easeOutBack(p);
-  c.save(); c.fillStyle = 'rgba(30,12,5,' + (0.45 * p) + ')'; c.fillRect(0, 0, W, H);
-  c.translate(W / 2, H / 2); c.scale(Math.max(0.01, k), Math.max(0.01, k)); c.globalAlpha = p;
-  rr(c, -236, -166, 480, 350, 30); c.fillStyle = 'rgba(30,10,3,.5)'; c.fill();
-  rr(c, -240, -175, 480, 350, 30);
-  const g = c.createLinearGradient(0, -175, 0, 175); g.addColorStop(0, '#fbe3b0'); g.addColorStop(1, '#e8ad5c');
-  c.fillStyle = g; c.fill(); c.lineWidth = 6; c.strokeStyle = '#4a2410'; c.stroke();
-  rr(c, -230, -165, 460, 330, 24); c.lineWidth = 2.5; c.strokeStyle = 'rgba(255,248,224,.8)'; c.stroke();
-  txt(c, '¡SE CAYÓ LA TORRE! 🧇', 0, -125, 31, '#fff', '#3b1a0b', 8);
-  txt(c, 'PUNTAJE', 0, -78, 19, '#7a4a20');
-  txt(c, String(score), 0, -34, 62, '#fff', '#3b1a0b', 10);
-  txt(c, 'MEJOR', 0, 28, 19, '#7a4a20');
-  txt(c, String(best), 0, 62, 42, '#ffe066', '#3b1a0b', 9);
-  if (newRecord) { c.save(); c.translate(150, -38); c.rotate(0.2); txt(c, '¡NUEVO RÉCORD!', 0, 0, 17, '#fff', '#c0392b', 6); c.restore(); }
-  const pulse = 1 + Math.sin(btnPulse * 5) * 0.025;
-  c.save(); c.translate(0, 129); c.scale(pulse, pulse);
-  rr(c, -150, -27, 300, 62, 20); c.fillStyle = 'rgba(30,10,3,.5)'; c.fill();
-  rr(c, -150, -31, 300, 62, 20);
-  const g2 = c.createLinearGradient(0, -31, 0, 31); g2.addColorStop(0, '#7fd36a'); g2.addColorStop(1, '#3c9a3c');
-  c.fillStyle = g2; c.fill(); c.lineWidth = 5; c.strokeStyle = '#2a4a1a'; c.stroke();
-  txt(c, 'VOLVER A JUGAR', 0, 1, 28, '#fff', '#1f4a1a', 7);
-  c.restore();
-  c.restore();
+
+// Flechas del teclado para moverse entre los emojis de una cuadrícula (Memoria y Vista)
+function flechasCuadricula(cuad) {
+  cuad.addEventListener('keydown', (e) => {
+    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    const fichas = [...cuad.querySelectorAll('.ficha')];
+    const actual = fichas.indexOf(document.activeElement);
+    if (actual < 0) return;
+    e.preventDefault();
+    const columnas = Math.round(Math.sqrt(fichas.length)) || 1;   // las cuadrículas son cuadradas
+    const salto = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -columnas, ArrowDown: columnas }[e.key];
+    const destino = fichas[actual + salto];
+    if (destino) destino.focus();
+  });
 }
 
-function render() {
-  const c = ctx;
-  c.setTransform(sc, 0, 0, sc, 0, 0);
-  const par = Math.min(camY * 0.12, 110);
-  c.drawImage(bg.c, 0, -110 + par, W, H + 110);
 
-  const sx = shake ? (Math.random() - 0.5) * shake : 0, sy = shake ? (Math.random() - 0.5) * shake : 0;
-  c.save(); c.translate(sx, camY + sy);
-  c.drawImage(table.c, 0, PY - 98, W, 300);
-  drawPlate(c);
-  // sombra dinámica de la torre
-  const topL = layers[layers.length - 1];
-  c.fillStyle = 'rgba(70,20,10,.22)'; c.beginPath(); c.ellipse(PX + 10, PY + 12, Math.min(190, 70 + topL.w * 0.6), 22, 0, 0, TAU); c.fill();
-  for (let i = 0; i < layers.length; i++) {
-    const l = layers[i];
-    if (l.y + camY > H + 80 || l.y + camY < -120) continue;
-    drawLayer(c, l, i);
-  }
-  for (const p of pieces) {
-    const a = clamp(p.life / 0.4, 0, 1); if (a <= 0) continue;
-    c.save(); c.translate(p.px, p.py); c.rotate(p.rot); const s = 0.75 + 0.25 * a; c.scale(s, s); c.globalAlpha = a;
-    c.beginPath(); c.rect(p.l - p.px, -300, p.r - p.l, 600); c.clip();
-    drawWaffle(c, p.cx - p.px, -TH / 2, p.w, p);
-    if (p.side) {
-      const ex = (p.side < 0 ? p.r : p.l) - p.px;
-      c.strokeStyle = '#4f2410'; c.lineWidth = 3.5; c.beginPath(); c.moveTo(ex, -TH / 2 - p.w * 0.15); c.lineTo(ex, TH / 2 + p.w * 0.15); c.stroke();
-    }
-    c.restore();
-  }
-  if (drop) {
-    // sombra de caída
-    const ty = topL.y - TH;
-    c.fillStyle = 'rgba(60,20,8,.2)'; c.beginPath(); c.ellipse(drop.x, topL.y + Math.max(5, topL.w * 0.15) * 0.4, drop.w * 0.42, 6, 0, 0, TAU); c.fill();
-    drawWaffle(c, drop.x, drop.y, drop.w, drop);
-  }
-  for (const p of parts) {
-    const a = clamp(p.life / p.max, 0, 1); c.globalAlpha = a;
-    if (p.t === 'dust') { c.fillStyle = 'rgba(255,244,222,.9)'; c.beginPath(); c.arc(p.x, p.y, p.s * (1.6 - a * 0.6), 0, TAU); c.fill(); }
-    else if (p.t === 'spark') { c.fillStyle = '#ffd34d'; c.beginPath(); c.arc(p.x, p.y, p.s * (0.4 + a * 0.6), 0, TAU); c.fill(); }
-    else if (p.t === 'star') { star(c, p.x, p.y, p.s * (0.5 + a * 0.5), p.rot); c.fillStyle = '#fff2a0'; c.fill(); c.lineWidth = 1.5; c.strokeStyle = '#d9930f'; c.stroke(); }
-    else if (p.t === 'ring') { c.strokeStyle = '#ffe680'; c.lineWidth = 5 * a; c.beginPath(); c.ellipse(p.x, p.y, p.s + (1 - a) * 150, (p.s + (1 - a) * 150) * 0.28, 0, 0, TAU); c.stroke(); }
-  }
-  c.globalAlpha = 1;
-  for (const f of floaters) {
-    const k = f.big ? easeOutBack(Math.min(1, f.t / 0.25)) : 1, a = clamp((f.max - f.t) / 0.25, 0, 1);
-    c.save(); c.globalAlpha = a; c.translate(f.x, f.y); c.scale(Math.max(0.01, k), Math.max(0.01, k));
-    txt(c, f.text, 0, 0, f.size, f.color, '#3b1a0b', f.big ? 9 : 6); c.restore();
-  }
-  c.restore();
+/* =====================================================================
+   PRUEBA 🧩 MEMORIA  (ajustes en 🔧 MEMORIA)
+   ===================================================================== */
+function empezarMemoria(juego) {
+  const C = CONFIG.MEMORIA;
+  const emojis = mezclar(EMOJIS_MEMORIA.slice()).slice(0, 9);
+  let largo = C.INICIO;        // largo de la secuencia actual
+  let vidas = C.VIDAS;
+  let mejor = 0;               // largo más largo completado
+  let errores = 0;
+  let secuencia = [];          // números de casilla (0 a 8) en orden
+  let progreso = 0;            // cuántas casillas de la secuencia ya tocaste bien
+  let fase = 'entre';          // 'mostrando' | 'entrada' (tu turno) | 'entre' (mensaje) | 'fin'
+  let idEspera = null;
 
-  // pantalla: garra + waffle sostenido
-  if (state !== 'over' || true) {
-    if (held) {
-      c.save(); c.translate(clawX, HOLD_Y); c.scale(held.scale, held.scale);
-      drawWaffle(c, 0, 0, held.w, held); c.restore();
-    }
-    drawClaw(c, clawX, held ? held.w * held.scale : lastW, open);
-  }
-  drawHUD();
-  drawHint();
-  if (state === 'over') drawOver();
-}
-
-/* ================= ENTRADA ================= */
-function toLogical(e) {
-  const r = cv.getBoundingClientRect();
-  return { x: (e.clientX - r.left) / r.width * W, y: (e.clientY - r.top) / r.height * H };
-}
-cv.addEventListener('pointerdown', e => {
-  e.preventDefault(); ensureAudio();
-  const p = toLogical(e);
-  if (Math.hypot(p.x - SND.x, p.y - SND.y) < 34) { toggleSound(); return; }
-  if (state === 'over') {
-    const b = panelGeom();
-    if (panelT > 0.5 && p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y - 8 && p.y <= b.y + b.h + 8) { resetGame(); }
-    return;
-  }
-  release();
-}, { passive: false });
-document.addEventListener('pointerup', ensureAudio);
-window.addEventListener('keydown', e => {
-  if (e.code === 'Space' || e.code === 'Enter') {
-    e.preventDefault(); if (e.repeat) return; ensureAudio();
-    if (state === 'over') { if (panelT > 0.6) resetGame(); } else release();
-  } else if (e.code === 'KeyM') toggleSound();
-});
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('gesturestart', e => e.preventDefault());
-document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-
-/* ================= BUCLE ================= */
-let last = 0;
-function frame(t) {
-  requestAnimationFrame(frame);
-  const dt = Math.min(0.033, (t - last) / 1000 || 0.016); last = t;
-  try { update(dt); render(); } catch (err) { console.error(err); }
-}
-resize();
-resetGame();
-requestAnimationFrame(frame);
-})();
-</script>
-</body>
-</html>
+  juego.area.innerHTML = `
+    <p class="mensaje-prueba" id="msgMemoria" aria-live="polite"></p>
+    <div class="caja-cuadricula"><div class="cuadricula" id="cuadMemoria"></div></div>`;
+  const cuad = $('cuadMemoria');
+  const fichas = emojis.map((emo, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
